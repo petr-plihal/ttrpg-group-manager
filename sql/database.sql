@@ -205,7 +205,7 @@ CREATE TABLE IF NOT EXISTS `usertag` (
 INSERT INTO `user` (`username`, `profilepicture`, `description`, `candm`) VALUES
 ('xxxPepik69', '<URL>/profile1.jpg', 'A passionate gamer.', 1),
 ('jane_doe', '<URL>/profile2.jpg', 'Loves RPG games.', 0),
-('Bao bei', '<URL>/profile3.jpg', 'Xǐhuān cèlüè yóuxì.', 1),
+('Bao bei', '<URL>/profile3.jpg', 'test description', 1),
 ('cazzo-grasso', '<URL>/profile4.jpg', 'Appassionato di giochi da tavolo.', 0);
 
 -- -----------------------------------------------------
@@ -224,7 +224,7 @@ INSERT INTO `group` (`name`, `description`, `location`, `isopen`, `languages`, `
 ('Adventurers', 'A group for D&D enthusiasts.', 'New York', 1, 'English', 5, 1, 1, 'Some sort of data structure? Long string?'),
 ('Esploratori', 'A group for Pathfinder players.', 'Online', 0, 'Italian', 4, 0, 2, 'Some sort of data structure? Long string?'),
 ('Catan Club', 'A group for Catan players.', 'Chicago', 1, 'English', 6, 0, 3, 'Some sort of data structure? Long string?'),
-('Màoxiǎn zhě', 'A group for Risk players.', 'Online', 1, 'English', 4, 0, 4, 'Some sort of data structure? Long string?');
+('Test Group Name', 'A group for Risk players.', 'Online', 1, 'English', 4, 0, 4, 'Some sort of data structure? Long string?');
 
 -- -----------------------------------------------------
 -- Insert data into `application`
