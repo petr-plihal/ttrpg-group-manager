@@ -69,10 +69,12 @@ CREATE TABLE IF NOT EXISTS `group` (
 -- Table `application`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `application` (
+  `id` INT NOT NULL AUTO_INCREMENT,
   `applicantid` INT NOT NULL,
   `groupid` INT NOT NULL,
   `description` VARCHAR(600) NULL DEFAULT NULL,
   `appchatcontent` TEXT NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
   INDEX `fk_user_application_idx` (`applicantid` ASC) VISIBLE,
   INDEX `fk_group_application_idx` (`groupid` ASC) VISIBLE,
   CONSTRAINT `fk_user_application`
@@ -91,10 +93,12 @@ CREATE TABLE IF NOT EXISTS `application` (
 -- Table `belongsto`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `belongsto` (
+  `id` INT NOT NULL AUTO_INCREMENT,
   `userid` INT NOT NULL,
   `groupid` INT NOT NULL,
   `isowner` BOOLEAN NOT NULL,
   `nickname` VARCHAR(30) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
   INDEX `fk_user_belongs_to_idx` (`userid` ASC) VISIBLE,
   INDEX `fk_group_belongs_to_idx` (`groupid` ASC) VISIBLE,
   CONSTRAINT `fk_user_belongsto`
@@ -123,8 +127,10 @@ CREATE TABLE IF NOT EXISTS `tag` (
 -- Table `grouptag`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `grouptag` (
+  `id` INT NOT NULL AUTO_INCREMENT,
   `groupid` INT NOT NULL,
   `tagid` INT NOT NULL,
+  PRIMARY KEY (`id`),
   INDEX `fk_tag_grouptag_idx` (`tagid` ASC) VISIBLE,
   INDEX `fk_group_grouptag_idx` (`groupid` ASC) VISIBLE,
   CONSTRAINT `fk_tag_grouptag`
@@ -143,10 +149,12 @@ CREATE TABLE IF NOT EXISTS `grouptag` (
 -- Table `schedule`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `schedule` (
+  `id` INT NOT NULL AUTO_INCREMENT,
   `userid` INT NOT NULL,
   `day` ENUM('mo', 'tu', 'we', 'th', 'fr', 'sa', 'su') NOT NULL,
   `starttime` TIME NOT NULL DEFAULT '00:00:00',
   `endtime` TIME NOT NULL DEFAULT '23:59:59',
+  PRIMARY KEY (`id`),
   INDEX `id_idx` (`userid` ASC) VISIBLE,
   CONSTRAINT `fk_user_schedule`
     FOREIGN KEY (`userid`)
@@ -159,11 +167,13 @@ CREATE TABLE IF NOT EXISTS `schedule` (
 -- Table `session`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `session` (
+  `id` INT NOT NULL AUTO_INCREMENT,
   `groupid` INT NOT NULL,
   `num` INT NULL DEFAULT NULL,
   `description` VARCHAR(600) NULL DEFAULT NULL,
   `starttime` DATETIME NOT NULL,
   `duration` INT NOT NULL,
+  PRIMARY KEY (`id`),
   INDEX `fk_group_session_idx` (`groupid` ASC) VISIBLE,
   CONSTRAINT `fk_group_session`
     FOREIGN KEY (`groupid`)
@@ -176,9 +186,11 @@ CREATE TABLE IF NOT EXISTS `session` (
 -- Table `usertag`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `usertag` (
+  `id` INT NOT NULL AUTO_INCREMENT,
   `userid` INT NOT NULL,
   `tagid` INT NOT NULL,
   `islooking` BOOLEAN NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
   INDEX `fk_user_id_idx` (`userid` ASC) VISIBLE,
   INDEX `fk_tag_usertag_idx` (`tagid` ASC) VISIBLE,
   CONSTRAINT `fk_user_usertag`
