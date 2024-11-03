@@ -56,7 +56,7 @@ def createUser(request):
 def getDMUsers(request):
     users = User.objects.filter(candm=True)
     result_users = modelAsJson(users)
-    result = {'status': 'success', 'users': result_users}
+    result = {'status': 'success', 'data': result_users}
     return JsonResponse(result)
 
 
@@ -104,7 +104,7 @@ def getGroupByGame(request, game: int):
         return JsonResponse({'error': 'Group not found'}, status=404)
 
     result_list = modelAsJson(group)
-    result = {'status': 'success', 'groups': result_list}
+    result = {'status': 'success', 'data': result_list}
     return JsonResponse(result)
 
 
@@ -147,7 +147,7 @@ def getGroupByLanguage(request, languages: str):
     group = Group.objects.filter(languages=languages)
 
     result_groups = modelAsJson(group)
-    result = {'status': 'success', 'groups': result_groups}
+    result = {'status': 'success', 'data': result_groups}
     return JsonResponse(result)
 
 
@@ -156,7 +156,7 @@ def getGroupWithoutDM(request):
     group = Group.objects.filter(dmneeded=True)
 
     result_groups = modelAsJson(group)
-    result = {'status': 'success', 'groups': result_groups}
+    result = {'status': 'success', 'data': result_groups}
     return JsonResponse(result)
 
 
