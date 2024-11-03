@@ -1,11 +1,15 @@
-from django.urls import path
+from django.urls import re_path
 
 from . import views
 
 urlpatterns = [
-    path("", views.index, name="index"),
-    path("user/<int:user_id>/", views.user_detail, name="user_detail"),
-    path("group/<int:group_id>/", views.group_detail, name="group_detail"),
-    path("user/<int:user_id>/groups/", views.user_groups, name="user_groups"),
-    path("group/<int:group_id>/sessions/", views.group_sessions, name="group_sessions"),
+    re_path("^user/?$", views.createUser, name="createUser"),
+    re_path("^dmusers/?$", views.getDMUsers, name="getDMUsers"),
+    re_path("^group/?$", views.createGroup, name="createGroup"),
+    re_path("^group/(?P<game>\\d+)/?$", views.getGroupByGame, name="getGroupByGame"),
+    re_path("^group/(?P<languages>\\w+)/?$", views.getGroupByLanguage, name="getGroupByLanguage"),
+    re_path("^groupnodm/?$", views.getGroupWithoutDM, name="getGroupWithoutDM"),
+    re_path("^game/?$", views.createGame, name="createGame"),
+    re_path("^denyApplication/(?P<application_id>\\d+)/?$", views.denyApplication, name="denyApplication"),
+    re_path("^acceptApplication/(?P<application_id>\\d+)/?$", views.acceptApplication, name="acceptApplication"),
 ]
