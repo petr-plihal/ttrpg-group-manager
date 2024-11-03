@@ -1,7 +1,7 @@
 from django.contrib.admin.options import json
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.serializers import serialize
+from django.views.decorators.http import require_GET, require_POST
 from TTRPGLFG.models import User, Group, Game, Application, Belongsto
 
 #####################################################
@@ -18,10 +18,8 @@ def modelAsJson(model):
 #####################################################
 
 
+@require_POST
 def createUser(request):
-    if request.method != 'POST':
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
-
     if not request.body:
         return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
 
@@ -54,20 +52,16 @@ def createUser(request):
     return JsonResponse({'status': 'success'})
 
 
+@require_GET
 def getDMUsers(request):
-    if request.method != 'GET':
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
-
     users = User.objects.filter(candm=True)
     result_users = modelAsJson(users)
     result = {'status': 'success', 'users': result_users}
     return JsonResponse(result)
 
 
+@require_POST
 def createGroup(request):
-    if request.method != 'POST':
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
-
     if not request.body:
         return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
 
@@ -103,10 +97,8 @@ def createGroup(request):
     return JsonResponse({'status': 'success'})
 
 
+@reuqire_GET
 def getGroupByGame(request, game: int):
-    if request.method != 'GET':
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
-
     group = Group.objects.filter(gameid=Game.objects.get(id=game))
     if not group:
         return JsonResponse({'error': 'Group not found'}, status=404)
@@ -116,10 +108,8 @@ def getGroupByGame(request, game: int):
     return JsonResponse(result)
 
 
+@require_POST
 def createGame(request):
-    if request.method != 'POST':
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
-
     if not request.body:
         return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
 
@@ -152,10 +142,8 @@ def createGame(request):
     return JsonResponse({'status': 'success'})
 
 
+@require_GET
 def getGroupByLanguage(request, languages: str):
-    if request.method != 'GET':
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
-
     group = Group.objects.filter(languages=languages)
 
     result_groups = modelAsJson(group)
@@ -163,10 +151,8 @@ def getGroupByLanguage(request, languages: str):
     return JsonResponse(result)
 
 
+@require_GET
 def getGroupWithoutDM(request):
-    if request.method != 'GET':
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
-
     group = Group.objects.filter(dmneeded=True)
 
     result_groups = modelAsJson(group)
@@ -174,10 +160,8 @@ def getGroupWithoutDM(request):
     return JsonResponse(result)
 
 
+@reuqire_POST
 def acceptApplication(request, application_id: int):
-    if request.method != 'POST':
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
-
     application = Application.objects.get(id=application_id)
     if not application:
         return JsonResponse({'error': 'Application not found'}, status=404)
@@ -189,10 +173,8 @@ def acceptApplication(request, application_id: int):
     return JsonResponse({'status': 'success'})
 
 
+@require_POST
 def denyApplication(request, application_id: int):
-    if request.method != 'POST':
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
-
     application = Application.objects.get(id=application_id)
     if not application:
         return JsonResponse({'error': 'Application not found'}, status=404)
