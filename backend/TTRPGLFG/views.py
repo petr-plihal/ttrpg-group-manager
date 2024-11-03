@@ -1,129 +1,202 @@
+from django.contrib.admin.options import json
 from django.shortcuts import render
-from django.http import HttpResponse
-from TTRPGLFG.models import User, Group, Belongsto, Session
+from django.http import JsonResponse
+from django.core.serializers import serialize
+from TTRPGLFG.models import User, Group, Game, Application, Belongsto
+
+#####################################################
+# Helper function
+#####################################################
 
 
-def index(request):
-    response = b'''\
-This is the <a href="http://127.0.0.1:8000/">home page</a> (<a href="http://127.0.0.1:8000/ttrpglfg/">alternative link</a>)<br>
-available endpoints are<br>
-- <a href="http://127.0.0.1:8000/admin/">admin page</a><br>
-(The following URLs have a number in the adress bar which you can change to look at a different row of the table)<br>
-- <a href="http://127.0.0.1:8000/ttrpglfg/user/1">single user view</a><br>
-- <a href="http://127.0.0.1:8000/ttrpglfg/group/1">single group view</a><br>
-- <a href="http://127.0.0.1:8000/ttrpglfg/user/1/groups">user\'s groups view</a><br>
-- <a href="http://127.0.0.1:8000/ttrpglfg/group/1/sessions">group\'s sessions view</a><br>
-'''
-    return HttpResponse(response)
+def modelAsJson(model):
+    return json.loads(serialize("json", model))
 
 
-def user_detail(request, user_id):
-    if user_id >= User.objects.count() or user_id < 1:
-        return HttpResponse(b'User ID out of range')
-
-    user = User.objects.get(id=user_id)
-
-    response = f'''\
-User {user_id}:<br>
-- username: {user.username}<br>
-- profilepicture: {user.profilepicture}<br>
-- description: {user.description}<br>
-- candm: {user.candm}
-'''
-    prev = f'<br><br><a href="http://127.0.0.1:8000/ttrpglfg/user/{user_id - 1}">Previous user</a>'
-    mid = ''
-    next = f'<a href="http://127.0.0.1:8000/ttrpglfg/user/{user_id + 1}">Next user</a>'
-    if user_id != 1:
-        response += prev
-        mid = ' | '
-    else:
-        mid = '<br><br>'
-    if user_id != User.objects.count() - 1:
-        response += mid + next
-
-    response += '<br><br><a href="http://127.0.0.1:8000/">Back to home</a>'
-
-    return HttpResponse(bytes(response, 'utf-8'))
+#####################################################
+# endpoints
+#####################################################
 
 
-def group_detail(request, group_id):
-    if group_id >= Group.objects.count() or group_id < 1:
-        return HttpResponse(b'Group ID out of range')
+def createUser(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
 
-    group = Group.objects.get(id=group_id)
+    if not request.body:
+        return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
 
-    response = f'''\
-Group {group_id}:<br>
-- name: {group.name}<br>
-- description: {group.description}<br>
-- location: {group.location}<br>
-- isopen: {group.isopen}<br>
-- languages: {group.languages}<br>
-- maxsize: {group.maxsize}<br>
-- dmneeded: {group.dmneeded}<br>
-- gameid: {group.gameid.name}<br>
-- groupchatcontent: {group.groupchatcontent}<br>
-'''
-    prev = f'<br><br><a href="http://127.0.0.1:8000/ttrpglfg/group/{group_id - 1}">Previous group</a>'
-    mid = ''
-    next = f'<a href="http://127.0.0.1:8000/ttrpglfg/group/{group_id + 1}">Next group</a>'
-    if group_id != 1:
-        response += prev
-        mid = ' | '
-    else:
-        mid = '<br><br>'
-    if group_id != Group.objects.count() - 1:
-        response += mid + next
+    try:
+        json_data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-    response += '<br><br><a href="http://127.0.0.1:8000/">Back to home</a>'
+    if not json_data or not hasattr(json_data, 'username') or not json_data['username']:
+        return JsonResponse({'status': 'error', 'message': 'Wrong JSON format'}, status=400)
 
-    return HttpResponse(bytes(response, 'utf-8'))
+    if (User.objects.filter(username=json_data['username']).exists()):
+        return JsonResponse({'status': 'error', 'message': 'User already exists'}, status=409)
 
+    field_names = [
+        field.name for field in User._meta.fields if field.name != 'id']
+    missing_fields = [field for field in field_names if field not in json_data]
+    if (missing_fields):
+        return JsonResponse({'status': 'error', 'message': 'Missing fields', "fields": missing_fields}, status=400)
 
-def user_groups(request, user_id):
-    if user_id >= User.objects.count() or user_id < 1:
-        return HttpResponse(b'User ID out of range')
+    user = User()
+    for key in json_data:
+        setattr(user, key, json_data[key])
 
-    user_groups = Belongsto.objects.filter(userid=user_id).select_related('groupid')
-    groups = [entry.groupid for entry in user_groups]
+    try:
+        user.save()
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
 
-    response = f'Groups of user {user_id}:<br>' + '<br>'.join([f'{group.id}: {group.name}' for group in groups])
-
-    prev = f'<br><br><a href="http://127.0.0.1:8000/ttrpglfg/user/{user_id - 1}/groups">Previous user</a>'
-    mid = ''
-    next = f'<a href="http://127.0.0.1:8000/ttrpglfg/user/{user_id + 1}/groups">Next user</a>'
-    if user_id != 1:
-        response += prev
-        mid = ' | '
-    else:
-        mid = '<br><br>'
-    if user_id != User.objects.count() - 1:
-        response += mid + next
-
-    response += '<br><br><a href="http://127.0.0.1:8000/">Back to home</a>'
-
-    return HttpResponse(bytes(response, 'utf-8'))
+    return JsonResponse({'status': 'success'})
 
 
-def group_sessions(request, group_id):
-    if group_id >= Group.objects.count() or group_id < 1:
-        return HttpResponse(b'Group ID out of range')
+def getDMUsers(request):
+    if request.method != 'GET':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
 
-    sessions = Session.objects.filter(groupid=group_id)
+    users = User.objects.filter(candm=True)
+    result_users = modelAsJson(users)
+    result = {'status': 'success', 'users': result_users}
+    return JsonResponse(result)
 
-    response = f'Sessions of group {group_id}:<br>' + '<br>'.join([f'{session.num}: {session.starttime}, {session.description}' for session in sessions])
 
-    prev = f'<br><br><a href="http://127.0.0.1:8000/ttrpglfg/group/{group_id - 1}/sessions">Previous group</a>'
-    mid = ''
-    next = f'<a href="http://127.0.0.1:8000/ttrpglfg/group/{group_id + 1}/sessions">Next group</a>'
-    if group_id != 1:
-        response += prev
-        mid = ' | '
-    else:
-        mid = '<br><br>'
-    if group_id != Group.objects.count() - 1:
-        response += mid + next
+def createGroup(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
 
-    response += '<br><br><a href="http://127.0.0.1:8000/">Back to home</a>'
+    if not request.body:
+        return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
 
-    return HttpResponse(bytes(response, 'utf-8'))
+    try:
+        json_data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+    if not json_data or not 'name' in json_data or not json_data['name']:
+        return JsonResponse({'status': 'error', 'message': 'Wrong JSON format'}, status=400)
+
+    if (Group.objects.filter(name=json_data['name']).exists()):
+        return JsonResponse({'status': 'error', 'message': 'Group already exists'}, status=409)
+
+    field_names = [
+        field.name for field in Group._meta.fields if field.name != 'id']
+    missing_fields = [field for field in field_names if field not in json_data]
+    if (missing_fields):
+        return JsonResponse({'status': 'error', 'message': 'Missing fields', "fields": missing_fields}, status=400)
+
+    group = Group()
+    for key in json_data:
+        if (key == 'gameid'):
+            setattr(group, key, Game.objects.get(id=json_data[key]))
+            continue
+        setattr(group, key, json_data[key])
+
+    try:
+        group.save()
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
+
+    return JsonResponse({'status': 'success'})
+
+
+def getGroupByGame(request, game: int):
+    if request.method != 'GET':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+    group = Group.objects.filter(gameid=Game.objects.get(id=game))
+    if not group:
+        return JsonResponse({'error': 'Group not found'}, status=404)
+
+    result_list = modelAsJson(group)
+    result = {'status': 'success', 'groups': result_list}
+    return JsonResponse(result)
+
+
+def createGame(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+    if not request.body:
+        return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
+
+    try:
+        json_data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+    if not json_data or not 'name' in json_data or not json_data['name']:
+        return JsonResponse({'status': 'error', 'message': 'Wrong JSON format'}, status=400)
+
+    if (Game.objects.filter(name=json_data['name']).exists()):
+        return JsonResponse({'status': 'error', 'message': 'Game already exists'}, status=409)
+
+    field_names = [
+        field.name for field in Game._meta.fields if field.name != 'id']
+    missing_fields = [field for field in field_names if field not in json_data]
+    if (missing_fields):
+        return JsonResponse({'status': 'error', 'message': 'Missing fields', "fields": missing_fields}, status=400)
+
+    game = Game()
+    for key in json_data:
+        setattr(game, key, json_data[key])
+
+    try:
+        game.save()
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
+
+    return JsonResponse({'status': 'success'})
+
+
+def getGroupByLanguage(request, languages: str):
+    if request.method != 'GET':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+    group = Group.objects.filter(languages=languages)
+
+    result_groups = modelAsJson(group)
+    result = {'status': 'success', 'groups': result_groups}
+    return JsonResponse(result)
+
+
+def getGroupWithoutDM(request):
+    if request.method != 'GET':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+    group = Group.objects.filter(dmneeded=True)
+
+    result_groups = modelAsJson(group)
+    result = {'status': 'success', 'groups': result_groups}
+    return JsonResponse(result)
+
+
+def acceptApplication(request, application_id: int):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+    application = Application.objects.get(id=application_id)
+    if not application:
+        return JsonResponse({'error': 'Application not found'}, status=404)
+
+    group = Group.objects.get(id=application.groupid)
+    user = User.objects.get(id=application.applicantid)
+    Belongsto.objects.create(userid=user, groupid=group, isowner=False)
+
+    return JsonResponse({'status': 'success'})
+
+
+def denyApplication(request, application_id: int):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+    application = Application.objects.get(id=application_id)
+    if not application:
+        return JsonResponse({'error': 'Application not found'}, status=404)
+
+    application.delete()
+
+    return JsonResponse({'status': 'success'})
