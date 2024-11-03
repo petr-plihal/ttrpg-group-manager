@@ -1,6 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from TTRPGLFG.models import User, Group, Belongsto, Session
+from django.http import HttpResponse, JsonResponse
+from django.core.serializers import serialize
+from django.views.decorators.http import require_POST
+from TTRPGLFG.models import Application, Schedule, User, Group, Belongsto, Session
 
 
 def index(request):
@@ -127,3 +129,50 @@ def group_sessions(request, group_id):
     response += '<br><br><a href="http://127.0.0.1:8000/">Back to home</a>'
 
     return HttpResponse(bytes(response, 'utf-8'))
+
+
+def get_all_users(request):
+    users = User.objects.all()
+    users_json = serialize('json', users, fields=('id', 'username', 'profilepicture', 'description', 'candm'))
+    return JsonResponse(users_json, safe=False)
+
+
+def get_all_groups(request):
+    groups = Group.objects.all()
+    groups_json = serialize('json', groups, fields=('id', 'name', 'description', 'location', 'isopen', 'languages', 'maxsize', 'dmneeded', 'gameid', 'groupchatcontent'))
+    return JsonResponse(groups_json, safe=False)
+
+
+def get_open_groups(request):
+    print("requestttt: ", request)
+    groups = Group.objects.filter(isopen=True)
+    groups_json = serialize('json', groups, fields=('id', 'name', 'description', 'location', 'isopen', 'languages', 'maxsize', 'dmneeded', 'gameid'))
+    return JsonResponse(groups_json, safe=False)
+
+
+# call this with /groups/filter_tag/?tags=tag1&tags=tag2&tags=tag3
+def get_groups_with_tags(request):
+    tags = request.GET.getlist('tags')
+    print("tags: ", tags)
+    groups = Group.objects.filter(grouptag__tagid__name__in=tags).distinct()
+    groups_json = serialize('json', groups, fields=('id', 'name', 'description', 'location', 'isopen', 'languages', 'maxsize', 'dmneeded', 'gameid', 'groupchatcontent'))
+    return JsonResponse(groups_json, safe=False)
+
+# call this with /groups/exclude_tag/?tags=tag1&tags=tag2&tags=tag3
+def get_groups_without_tags(request):
+    tags = request.GET.getlist('tags')
+    print("tags: ", tags)
+    groups = Group.objects.exclude(grouptag__tagid__name__in=tags).distinct()
+    groups_json = serialize('json', groups, fields=('id', 'name', 'description', 'location', 'isopen', 'languages', 'maxsize', 'dmneeded', 'gameid', 'groupchatcontent'))
+    return JsonResponse(groups_json, safe=False)
+
+
+def get_user_schedule(request, user_id):
+    schedules = Schedule.objects.filter(userid=user_id)
+    schedule_json = serialize('json', schedules, fields=('day', 'starttime', 'endtime'))
+    return JsonResponse(schedule_json, safe=False)
+
+def get_app_chat(request, app_id):
+    print(request)
+    app = Application.objects.get(id=app_id)
+    return JsonResponse(app.appchatcontent, safe=False)
