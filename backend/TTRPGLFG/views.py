@@ -97,7 +97,7 @@ def createGroup(request):
     return JsonResponse({'status': 'success'})
 
 
-@reuqire_GET
+@require_GET
 def getGroupByGame(request, game: int):
     group = Group.objects.filter(gameid=Game.objects.get(id=game))
     if not group:
@@ -160,7 +160,7 @@ def getGroupWithoutDM(request):
     return JsonResponse(result)
 
 
-@reuqire_POST
+@require_POST
 def acceptApplication(request, application_id: int):
     application = Application.objects.get(id=application_id)
     if not application:
