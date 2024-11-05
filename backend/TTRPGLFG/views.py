@@ -2,7 +2,7 @@ from django.contrib.admin.options import json
 from django.http import JsonResponse
 from django.core.serializers import serialize
 from django.views.decorators.http import require_GET, require_POST
-from TTRPGLFG.models import User, Group, Game, Application, Belongsto
+from TTRPGLFG.models import User, Group, Game, Application, Belongsto, Session, Tag, Grouptag, Usertag
 
 #####################################################
 # Helper function
@@ -182,3 +182,218 @@ def denyApplication(request, application_id: int):
     application.delete()
 
     return JsonResponse({'status': 'success'})
+
+@require_POST
+def kickPlayer(request):
+    try:
+        json_data = json.loads(request.body)
+        group_id = json_data.get('group_id')
+        user_id = json_data.get('user_id')
+        
+        group = Group.objects.get(id=group_id)
+        user = User.objects.get(id=user_id)
+        membership = Belongsto.objects.get(groupid=group, userid=user)
+
+        membership.delete()
+        return JsonResponse({'status': 'success', 'message': f'User {user_id} kicked from group {group_id}'})
+    
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except Belongsto.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Membership of user {user_id} and group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_POST
+def invitePlayer(request):
+    try:
+        json_data = json.loads(request.body)
+        group_id = json_data.get('group_id')
+        user_id = json_data.get('user_id')
+        description = json_data.get('description', '')  # Default to an empty string if not provided
+        
+        group = Group.objects.get(id=group_id)
+        user = User.objects.get(id=user_id)
+        
+        # Check if user already has an application for this group
+        if Application.objects.filter(groupid=group, applicantid=user).exists():
+            return JsonResponse({'status': 'info', 'message': f'User {user_id} already has an application for group {group_id}'})
+        
+        Application.objects.create(groupid=group, applicantid=user, description=description)
+        return JsonResponse({'status': 'success', 'message': f'Application created for user {user_id} to join group {group_id}'})
+    
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_POST
+def applyToGroup(request):
+    try:
+        json_data = json.loads(request.body)
+        group_id = json_data.get('group_id')
+        user_id = json_data.get('user_id')
+        description = json_data.get('description', '') # Defaults to an empty string if not provided
+        
+        group = Group.objects.get(id=group_id)
+        user = User.objects.get(id=user_id)
+
+        Application.objects.create(groupid=group, applicantid=user, description=description)
+        return JsonResponse({'status': 'success', 'message': f'User {user_id} applied to group {group_id}'})
+    
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_POST
+def cancelApplication(request):
+    try:
+        json_data = json.loads(request.body)
+        group_id = json_data.get('group_id')
+        user_id = json_data.get('user_id')
+        
+        group = Group.objects.get(id=group_id)
+        user = User.objects.get(id=user_id)
+        application = Application.objects.get(groupid=group, applicantid=user)
+
+        application.delete()
+        return JsonResponse({'status': 'success', 'message': f'Application of user {user_id} to group {group_id} cancelled'})
+    
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except Application.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Application of user {user_id} to group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_GET
+def getGroupSessions(request, group_id):
+    try:
+        group = Group.objects.get(id=group_id)
+        sessions = Session.objects.filter(groupid=group)
+        sessions_data = modelAsJson(sessions)
+
+        return JsonResponse({'status': 'success', 'data': sessions_data})
+    
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_POST
+def addGroupTags(request):
+    try:
+        json_data = json.loads(request.body)
+        group_id = json_data.get('group_id')
+        tag_ids = json_data.get('tag_ids')
+        
+        group = Group.objects.get(id=group_id)
+        
+        # Check if all tags exist
+        tags = Tag.objects.filter(id__in=tag_ids)
+        if tags.count() != len(tag_ids):
+            return JsonResponse({'status': 'error', 'message': 'One or more tags not found'}, status=404)
+        
+        # Add tags to group only if they don't already exist
+        added_tags = []
+        for tag in tags:
+            if not Grouptag.objects.filter(groupid=group, tagid=tag).exists():
+                Grouptag.objects.create(groupid=group, tagid=tag)
+                added_tags.append(tag.id)
+        
+        if added_tags:
+            return JsonResponse({'status': 'success', 'message': f'Tags {added_tags} added to group {group_id}'})
+        else:
+            return JsonResponse({'status': 'info', 'message': f'No new tags were added, all tags already exist for group {group_id}'})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_POST
+def removeGroupTags(request):
+    try:
+        json_data = json.loads(request.body)
+        group_id = json_data.get('group_id')
+        tag_ids = json_data.get('tag_ids')
+        
+        group = Group.objects.get(id=group_id)
+        
+        # Check if all tags exist
+        tags = Tag.objects.filter(id__in=tag_ids)
+        if tags.count() != len(tag_ids):
+            return JsonResponse({'status': 'error', 'message': 'One or more tags not found'}, status=404)
+        
+        removed_tags = []
+        for tag in tags:
+            grouptag = Grouptag.objects.get(groupid=group, tagid=tag)
+            grouptag.delete()
+            removed_tags.append(tag.id)
+        return JsonResponse({'status': 'success', 'message': f'Tags {removed_tags} removed from group {group_id}'})
+    
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except Tag.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Tag not found'}, status=404)
+    except Grouptag.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'GroupTag not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_POST
+def addPlayerPreference(request):
+    try:
+        json_data = json.loads(request.body)
+        user_id = json_data.get('user_id')
+        tag_id = json_data.get('tag_id')
+        islooking = json_data.get('islooking')
+        
+        user = User.objects.get(id=user_id)
+        tag = Tag.objects.get(id=tag_id)
+        
+        # Only add the tag if it doesn't already exist
+        if not Usertag.objects.filter(userid=user, tagid=tag).exists():
+            Usertag.objects.create(userid=user, tagid=tag, islooking=islooking)
+            return JsonResponse({'status': 'success', 'message': f'Tag {tag_id} added to user {user_id} preferences'})
+        else:
+            return JsonResponse({'status': 'info', 'message': f'Tag {tag_id} already exists for user {user_id}'})
+        
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except Tag.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Tag {tag_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_POST
+def removePlayerPreference(request):
+    try:
+        json_data = json.loads(request.body)
+        user_id = json_data.get('user_id')
+        tag_id = json_data.get('tag_id')
+        
+        user = User.objects.get(id=user_id)
+        tag = Tag.objects.get(id=tag_id)
+        usertag = Usertag.objects.get(userid=user, tagid=tag)
+
+        usertag.delete()
+        return JsonResponse({'status': 'success', 'message': f'Tag {tag_id} removed from user {user_id} preferences'})
+    
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except Tag.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Tag {tag_id} not found'}, status=404)
+    except Usertag.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'UserTag {tag_id} for user {user_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)

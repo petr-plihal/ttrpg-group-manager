@@ -12,4 +12,13 @@ urlpatterns = [
     re_path("^game/?$", views.createGame, name="createGame"),
     re_path("^denyApplication/(?P<application_id>\\d+)/?$", views.denyApplication, name="denyApplication"),
     re_path("^acceptApplication/(?P<application_id>\\d+)/?$", views.acceptApplication, name="acceptApplication"),
+    re_path("^kickPlayer/?$", views.kickPlayer, name="kickPlayer"),
+    re_path("^invitePlayer/?$", views.invitePlayer, name="invitePlayer"),
+    re_path("^applyToGroup/?$", views.applyToGroup, name="applyToGroup"),
+    re_path("^cancelApplication/?$", views.cancelApplication, name="cancelApplication"),
+    re_path("^getGroupSessions/(?P<group_id>\\d+)/?$", views.getGroupSessions, name="getGroupSessions"),
+    re_path("^addGroupTags/?$", views.addGroupTags, name="addGroupTags"),
+    re_path("^removeGroupTags/?$", views.removeGroupTags, name="removeGroupTags"),
+    re_path("^addPlayerPreference/?$", views.addPlayerPreference, name="addPlayerPreference"),
+    re_path("^removePlayerPreference/?$", views.removePlayerPreference, name="removePlayerPreference"),
 ]
