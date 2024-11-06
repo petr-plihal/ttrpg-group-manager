@@ -2,7 +2,7 @@ from django.contrib.admin.options import json
 from django.http import JsonResponse
 from django.core.serializers import serialize
 from django.views.decorators.http import require_GET, require_POST
-from TTRPGLFG.models import User, Group, Game, Application, Belongsto
+from TTRPGLFG.models import Schedule, User, Group, Game, Application, Belongsto
 
 #####################################################
 # Helper function
@@ -182,3 +182,61 @@ def denyApplication(request, application_id: int):
     application.delete()
 
     return JsonResponse({'status': 'success'})
+
+
+@require_GET
+def get_all_users(request):
+    users = User.objects.all()
+    users_json = modelAsJson(users)
+    response = {'status': 'success', 'data': users_json}
+    return JsonResponse(response)
+
+
+@require_GET
+def get_all_groups(request):
+    groups = Group.objects.all()
+    groups_json = modelAsJson(groups)
+    response = {'status': 'success', 'data': groups_json}
+    return JsonResponse(response)
+
+
+@require_GET
+def get_open_groups(request):
+    groups = Group.objects.filter(isopen=True)
+    groups_json = modelAsJson(groups)
+    response = {'status': 'success', 'data': groups_json}
+    return JsonResponse(response)
+
+
+# request with /groups/filter_tag/?tags=tag1&tags=tag2&tags=tag3
+@require_GET
+def get_groups_with_tags(request):
+    tags = request.GET.getlist('tags')
+    groups = Group.objects.filter(grouptag__tagid__name__in=tags).distinct()
+    groups_json = modelAsJson(groups)
+    response = {'status': 'success', 'data': groups_json}
+    return JsonResponse(response)
+
+
+# request with /groups/exclude_tag/?tags=tag1&tags=tag2&tags=tag3
+@require_GET
+def get_groups_without_tags(request):
+    tags = request.GET.getlist('tags')
+    groups = Group.objects.exclude(grouptag__tagid__name__in=tags).distinct()
+    groups_json = modelAsJson(groups)
+    response = {'status': 'success', 'data': groups_json}
+    return JsonResponse(response)
+
+
+@require_GET
+def get_user_schedule(request, user_id):
+    schedules = Schedule.objects.filter(userid=user_id)
+    schedule_json = modelAsJson(schedules)
+    response = {'status': 'success', 'data': schedule_json}
+    return JsonResponse(response)
+
+
+@require_GET
+def get_app_chat(request, app_id):
+    app = Application.objects.get(id=app_id)
+    return JsonResponse(app.appchatcontent, safe=False)
