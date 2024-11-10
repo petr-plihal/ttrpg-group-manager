@@ -490,7 +490,7 @@ def getGroupChat(request, group_id: int):
 def getGroupApps(request, group_id: int):
     try:
         group = Group.objects.get(id = group_id)
-        groupApps = Application.objects.get(groupid = group)
+        groupApps = Application.objects.filter(groupid = group)
         groupAppsData = modelAsJson(groupApps)
 
         return JsonResponse({'status': 'success', 'data': groupAppsData})
@@ -519,8 +519,7 @@ def getGroupPlayers(request, group_id: int):
 def getGroupByID(request, group_id: int):
     
     try:
-        group = Group.objects.get(id = group_id)
-        print(group)
+        group = Group.objects.filter(id = group_id)
         groupData = modelAsJson(group)
 
         return JsonResponse({'status': 'success', 'data': groupData})
@@ -543,17 +542,17 @@ def getGroupByName(request, group_name: str):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-# doesnt work yet
 @require_GET
 def getGroupByDescription(request):
     if not request.body:
         return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
     
     try:
-        group = Group.objects.filter(description = request.body)
+        body_decode = request.body.decode('utf-8')
+        group = Group.objects.filter(description = body_decode)
         groupData = modelAsJson(group)
 
-        return JsonResponse({'status': 'success', 'data': request.body})
+        return JsonResponse({'status': 'success', 'data': groupData})
 
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group with the requested description not found'}, status=404)
