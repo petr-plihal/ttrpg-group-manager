@@ -542,6 +542,7 @@ def getGroupByName(request, group_name: str):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+#this endpoint expects the description to be sent in plaintext as the body of the request
 @require_GET
 def getGroupByDescription(request):
     if not request.body:
