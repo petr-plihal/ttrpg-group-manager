@@ -216,6 +216,10 @@ def invitePlayer(request):
         
         group = Group.objects.get(id=group_id)
         user = User.objects.get(id=user_id)
+
+        # Check if user is already a member of the group
+        if Belongsto.objects.filter(groupid=group, userid=user).exists():
+            return JsonResponse({'status': 'info', 'message': f'User {user_id} is already a member of group {group_id}'})
         
         # Check if user already has an application for this group
         if Application.objects.filter(groupid=group, applicantid=user).exists():
@@ -241,6 +245,14 @@ def applyToGroup(request):
         
         group = Group.objects.get(id=group_id)
         user = User.objects.get(id=user_id)
+
+        # Check if user is already a member of the group
+        if Belongsto.objects.filter(groupid=group, userid=user).exists():
+            return JsonResponse({'status': 'info', 'message': f'User {user_id} is already a member of group {group_id}'})
+        
+        # Check if user already has an application for this group
+        if Application.objects.filter(groupid=group, applicantid=user).exists():
+            return JsonResponse({'status': 'info', 'message': f'User {user_id} already has an application for group {group_id}'})
 
         Application.objects.create(groupid=group, applicantid=user, description=description)
         return JsonResponse({'status': 'success', 'message': f'User {user_id} applied to group {group_id}'})
