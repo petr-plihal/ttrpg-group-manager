@@ -519,7 +519,7 @@ def getGroupPlayers(request, group_id: int):
 def getGroupByID(request, group_id: int):
     
     try:
-        group = Group.objects.filter(id = group_id)
+        group = Group.objects.get(id = group_id)
         groupData = modelAsJson(group)
 
         return JsonResponse({'status': 'success', 'data': groupData})
