@@ -1,0 +1,9 @@
+landingPage{
+   display: flex;
+   flex-direction: column; 
+}
+
+landingButton{
+    display: flex;
+    flex-direction: row;  
+}

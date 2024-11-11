@@ -1,0 +1,9 @@
+<div class="landingPage">
+    <div>Logged in user is: {{ loggedUser?.username }}</div>
+    <button [routerLink]="['/']" skipLocationChange>Log out</button>
+    <button [routerLink]="['/']" skipLocationChange>Find groups</button>
+    <div class="landingButtons">
+        <button>DM</button>
+        <button>Player</button>
+    </div>   
+</div>
