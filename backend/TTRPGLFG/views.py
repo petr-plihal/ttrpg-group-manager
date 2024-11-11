@@ -410,7 +410,6 @@ def removePlayerPreference(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-#Could these be in camelcase please to maintain the naming convention that was set by Matyas
 
 ##########################
 # Autor: Marek Kozumplik
