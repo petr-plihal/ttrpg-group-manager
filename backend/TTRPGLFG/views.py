@@ -411,8 +411,14 @@ def removePlayerPreference(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 #Could these be in camelcase please to maintain the naming convention that was set by Matyas
+
+##########################
+# Autor: Marek Kozumplik
+#
+##########################
+
 @require_GET
-def get_all_users(request):
+def getAllUsers(request):
     users = User.objects.all()
     users_json = modelAsJson(users)
     response = {'status': 'success', 'data': users_json}
@@ -420,7 +426,7 @@ def get_all_users(request):
 
 
 @require_GET
-def get_all_groups(request):
+def getAllGroups(request):
     groups = Group.objects.all()
     groups_json = modelAsJson(groups)
     response = {'status': 'success', 'data': groups_json}
@@ -428,7 +434,7 @@ def get_all_groups(request):
 
 
 @require_GET
-def get_open_groups(request):
+def getOpenGroups(request):
     groups = Group.objects.filter(isopen=True)
     groups_json = modelAsJson(groups)
     response = {'status': 'success', 'data': groups_json}
@@ -437,7 +443,7 @@ def get_open_groups(request):
 
 # request with /groups/filter_tag/?tags=tag1&tags=tag2&tags=tag3
 @require_GET
-def get_groups_with_tags(request):
+def getGroupsWithTags(request):
     tags = request.GET.getlist('tags')
     groups = Group.objects.filter(grouptag__tagid__name__in=tags).distinct()
     groups_json = modelAsJson(groups)
@@ -447,7 +453,7 @@ def get_groups_with_tags(request):
 
 # request with /groups/exclude_tag/?tags=tag1&tags=tag2&tags=tag3
 @require_GET
-def get_groups_without_tags(request):
+def getGroupsWithoutTags(request):
     tags = request.GET.getlist('tags')
     groups = Group.objects.exclude(grouptag__tagid__name__in=tags).distinct()
     groups_json = modelAsJson(groups)
@@ -456,7 +462,7 @@ def get_groups_without_tags(request):
 
 
 @require_GET
-def get_user_schedule(request, user_id):
+def getUserSchedule(request, user_id):
     schedules = Schedule.objects.filter(userid=user_id)
     schedule_json = modelAsJson(schedules)
     response = {'status': 'success', 'data': schedule_json}
@@ -464,9 +470,25 @@ def get_user_schedule(request, user_id):
 
 
 @require_GET
-def get_app_chat(request, app_id):
+def getAppChat(request, app_id):
     app = Application.objects.get(id=app_id)
     return JsonResponse(app.appchatcontent, safe=False)
+
+@require_GET
+def getUserByID(request, user_id: int):
+    try:
+        user = User.objects.filter(id = user_id)
+        user_data = modelAsJson(user)
+
+        return JsonResponse({'status': 'success', 'data': user_data})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+
+############## End of Marek Kozumplk work ##############################
 
 
 ##########################
@@ -519,7 +541,7 @@ def getGroupPlayers(request, group_id: int):
 def getGroupByID(request, group_id: int):
     
     try:
-        group = Group.objects.get(id = group_id)
+        group = Group.objects.filter(id = group_id)
         groupData = modelAsJson(group)
 
         return JsonResponse({'status': 'success', 'data': groupData})
