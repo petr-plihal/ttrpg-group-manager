@@ -480,9 +480,6 @@ def getUserByID(request, user_id: int):
         user_data = modelAsJson(user)
 
         return JsonResponse({'status': 'success', 'data': user_data})
-
-    except Group.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
