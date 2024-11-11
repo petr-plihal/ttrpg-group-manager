@@ -410,6 +410,7 @@ def removePlayerPreference(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+#Could these be in camelcase please to maintain the naming convention that was set by Matyas
 @require_GET
 def get_all_users(request):
     users = User.objects.all()
@@ -466,3 +467,125 @@ def get_user_schedule(request, user_id):
 def get_app_chat(request, app_id):
     app = Application.objects.get(id=app_id)
     return JsonResponse(app.appchatcontent, safe=False)
+
+
+##########################
+# Autor: Marek Pechan
+#
+##########################
+@require_GET
+def getGroupChat(request, group_id: int):
+    try:
+        group = Group.objects.get(id=group_id)
+        groupChat = group.groupchatcontent
+
+        return JsonResponse({'status': 'success', 'data': groupChat})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_GET
+def getGroupApps(request, group_id: int):
+    try:
+        group = Group.objects.get(id = group_id)
+        groupApps = Application.objects.filter(groupid = group)
+        groupAppsData = modelAsJson(groupApps)
+
+        return JsonResponse({'status': 'success', 'data': groupAppsData})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+#returns the belongsto rows, to get users another endpoint needs to be called
+@require_GET
+def getGroupPlayers(request, group_id: int):
+    try:
+        group = Group.objects.get(id = group_id)
+        groupPlayers = Belongsto.objects.filter(groupid = group)
+        groupPlayerData = modelAsJson(groupPlayers)
+
+        return JsonResponse({'status': 'success', 'data': groupPlayerData})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_GET
+def getGroupByID(request, group_id: int):
+    
+    try:
+        group = Group.objects.get(id = group_id)
+        groupData = modelAsJson(group)
+
+        return JsonResponse({'status': 'success', 'data': groupData})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_GET
+def getGroupByName(request, group_name: str):
+    try:
+        group = Group.objects.filter(name = group_name)
+        groupData = modelAsJson(group)
+
+        return JsonResponse({'status': 'success', 'data': groupData})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_name} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+#this endpoint expects the description to be sent in plaintext as the body of the request
+@require_GET
+def getGroupByDescription(request):
+    if not request.body:
+        return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
+    
+    try:
+        body_decode = request.body.decode('utf-8')
+        group = Group.objects.filter(description = body_decode)
+        groupData = modelAsJson(group)
+
+        return JsonResponse({'status': 'success', 'data': groupData})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group with the requested description not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_GET
+def getUsersByPreference(request, tag_id: int):
+    try:
+        tag = Tag.objects.get(id = tag_id)
+        tagUsers = Usertag.objects.filter(tagid = tag, islooking = True)
+        tagUsersData = modelAsJson(tagUsers)
+
+        return JsonResponse({'status': 'success', 'data': tagUsersData})
+
+    except Tag.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {tag_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_GET
+def getUsersByAvoidance(request, tag_id: int):
+    try:
+        tag = Tag.objects.get(id = tag_id)
+        tagUsers = Usertag.objects.filter(tagid = tag, islooking = False)
+        tagUsersData = modelAsJson(tagUsers)
+
+        return JsonResponse({'status': 'success', 'data': tagUsersData})
+
+    except Tag.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {tag_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+############## End of Marek Pechan work ##############################
