@@ -1,7 +1,6 @@
 <div>
     <div>Logged in user is: {{ loggedUser?.username }}</div>
-    <button [routerLink]="['/']" skipLocationChange>Log out</button>
-    <button [routerLink]="['/findGroup']" skipLocationChange>Find groups</button>
+    <app-menu></app-menu>
     <div>
         <app-group-item *ngFor="let group of groupList" [group]="group"/>
     </div>

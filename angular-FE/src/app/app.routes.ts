@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { FindGroupComponent } from './find-group/find-group.component';
+import { FindPlayersComponent } from './find-players/find-players.component';
 
 
 export const routes: Routes = [
@@ -19,5 +20,10 @@ export const routes: Routes = [
         path: 'findGroup',
         component: FindGroupComponent,
         title: 'Find Group'
+    },
+    {
+        path: 'findPlayers',
+        component: FindPlayersComponent,
+        title: 'Find Players'
     }
 ];
