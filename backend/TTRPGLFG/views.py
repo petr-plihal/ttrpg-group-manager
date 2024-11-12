@@ -183,6 +183,11 @@ def denyApplication(request, application_id: int):
 
     return JsonResponse({'status': 'success'})
 
+##########################
+# Autor: Petr Plíhal
+#
+##########################
+
 @require_POST
 def kickPlayer(request):
     try:
@@ -409,7 +414,7 @@ def removePlayerPreference(request):
         return JsonResponse({'status': 'error', 'message': f'UserTag {tag_id} for user {user_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
+############## End of Petr Plíhal work ##############################
 
 ##########################
 # Autor: Marek Kozumplik
