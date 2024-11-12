@@ -28,4 +28,12 @@ urlpatterns = [
     re_path("^groups/exclude_tags/?$", views.get_groups_with_tags, name="get_groups_with_tag"),
     re_path("^users/user/(?P<user_id>\\d+)/schedule/?$", views.get_user_schedule, name="get_user_schedule"),
     re_path("^applications/application/(?P<app_id>\\d+)/chat/?$", views.get_app_chat, name="get_app_chat"),
+    re_path("^group/(?P<group_id>\\d+)/chat/?$", views.getGroupChat, name="getGroupChat"),
+    re_path("^group/(?P<group_id>\\d+)/applications/?$", views.getGroupApps, name="getGroupApps"),
+    re_path("^group/(?P<group_id>\\d+)/players/?$", views.getGroupPlayers, name="getGroupPlayers"),
+    re_path("^group/(?P<group_id>\\d+)/?$", views.getGroupByID, name="getGroupByID"),
+    re_path("^group/(?P<group_name>\\w+)/name/?$", views.getGroupByName, name="getGroupByName"),
+    re_path("^group/desc/?$", views.getGroupByDescription, name="getGroupByDescription"),
+    re_path("^users/(?P<tag_id>\\d+)/preference/?$", views.getUsersByPreference, name="getUsersByPreference"),
+    re_path("^users/(?P<tag_id>\\d+)/avoidance/?$", views.getUsersByAvoidance, name="getUsersByAvoidance"),
 ]
