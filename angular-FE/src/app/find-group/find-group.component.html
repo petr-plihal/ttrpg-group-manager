@@ -1,1 +1,30 @@
-<p>find-group works!</p>
+<div>
+    <div>Logged in user is: {{ loggedUser?.username }}</div>
+    <button [routerLink]="['/']" skipLocationChange>Log out</button>
+    <button [routerLink]="['/findGroup']" skipLocationChange>Find groups</button>
+    <div>
+        <app-group-item *ngFor="let group of groupList" [group]="group"/>
+    </div>
+    <form [formGroup]="createGroupForm" (submit)="createGroup()" class="form">
+        <label for="name">Group name</label>
+        <input id="name" type="text" formControlName="name"/>
+
+        <label for="location">Location</label>
+        <input id="location" type="text" formControlName="location"/>
+        
+        <label for="isopen">Is open?</label>
+        <input id="isopen" type="checkbox" formControlName="isopen"/>
+        
+        <label for="description">Description</label>
+        <input id="description" type="text" formControlName="description"/>
+        
+        <label for="maxsize">Max size</label>
+        <input id="maxsize" type="number" formControlName="maxsize"/>
+        
+        <label for="dmneeded">DM needed?</label>
+        <input id="dmneeded" type="checkbox" formControlName="dmneeded"/>
+        
+        <input type="submit"/>
+    </form>
+</div>
+

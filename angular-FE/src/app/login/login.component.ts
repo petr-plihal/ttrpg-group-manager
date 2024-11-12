@@ -29,8 +29,11 @@ export class LoginComponent {
     this.UsersService.setLoggedInUser(button);
   }
 
-  createUser() {
-    this.UsersService.createUser(this.createUserForm.value.username ?? '');
+  createUser() {  
+    if(this.createUserForm.value.username != undefined && this.createUserForm.value.username != ''){
+      this.UsersService.createUser(this.createUserForm.value.username ?? '');
+      this.loginButtonList.push({id: this.loginButtonList.length+1,name: this.createUserForm.value.username});
+    }
   }
 
 

@@ -3,7 +3,7 @@ import { LoginButton } from './login-button';
 import { User } from './user';
 import { BackendUrlService } from './backend-url.service';
 import { HttpClient } from '@angular/common/http';
-import { config, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,9 +21,6 @@ export class UsersService {
     return this.http.get<any>(this.urlService.getUrl() + 'users/');
   }
 
-  getLoginButtonsById(id: number): LoginButton | undefined {
-    return this.loginButtonList.find((loginButton) => loginButton.id === id);
-  }
   getLoggedInUser(): User | undefined {
     if (this.loggedInUser?.id === -1 || this.loggedInUser === undefined) {
       return undefined;
@@ -49,7 +46,7 @@ export class UsersService {
     if (username === undefined || username === ''){
       return;
     }
-    this.http.post<any>(this.urlService.getUrl() + 'user/', {username: username}).subscribe(result => {
+    this.http.post<any>(this.urlService.getUrl() + 'user/', {username: username, profilepicture: 'test', description: 'test', candm: true}).subscribe(result => {
       console.log(result)
     });
     this.loginButtonList.push({id: this.loginButtonList.length+1, name: username});
