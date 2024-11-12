@@ -7,10 +7,11 @@ import { GroupsService } from '../groups.service';
 import { GroupItemComponent } from '../group-item/group-item.component';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { MenuComponent } from '../menu/menu.component';
 @Component({
   selector: 'app-find-group',
   standalone: true,
-  imports: [RouterLink, GroupItemComponent, CommonModule, ReactiveFormsModule],
+  imports: [RouterLink, GroupItemComponent, CommonModule, ReactiveFormsModule, MenuComponent],
   templateUrl: './find-group.component.html',
   styleUrl: './find-group.component.css'
 })
