@@ -3,6 +3,8 @@ import { LoginComponent } from './login/login.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { FindGroupComponent } from './find-group/find-group.component';
 import { FindPlayersComponent } from './find-players/find-players.component';
+import { PlayerDetailsComponent } from './player-details/player-details.component';
+import { GroupDetailsComponent } from './group-details/group-details.component';
 
 
 export const routes: Routes = [
@@ -25,5 +27,15 @@ export const routes: Routes = [
         path: 'findPlayers',
         component: FindPlayersComponent,
         title: 'Find Players'
+    },
+    {
+        path: 'findPlayers/playerDetail/:id',
+        component: PlayerDetailsComponent,
+        title: 'Player details'
+    },
+    {
+        path: 'findGroup/groupDetail/:id',
+        component: GroupDetailsComponent,
+        title: 'Group details'
     }
 ];

@@ -2,7 +2,7 @@
     <div>Logged in user is: {{ loggedUser?.username }}</div>
     <app-menu></app-menu>
     <div>
-        <app-group-item *ngFor="let group of groupList" [group]="group"/>
+        <app-group-item *ngFor="let group of groupList" [group]="group" [routerLink]="['groupDetail/', group.id]"/>
     </div>
     <form [formGroup]="createGroupForm" (submit)="createGroup()" class="form">
         <label for="name">Group name</label>

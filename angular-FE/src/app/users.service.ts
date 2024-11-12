@@ -21,6 +21,10 @@ export class UsersService {
     return this.http.get<any>(this.urlService.getUrl() + 'users/');
   }
 
+  getUserById(id: number): Observable<any> {
+    return this.http.get<any>(this.urlService.getUrl() + 'user/' + id + '/id');
+  }
+
   getLoggedInUser(): User | undefined {
     if (this.loggedInUser?.id === -1 || this.loggedInUser === undefined) {
       return undefined;

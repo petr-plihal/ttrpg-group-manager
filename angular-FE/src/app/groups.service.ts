@@ -15,6 +15,9 @@ export class GroupsService {
   getAllGroups(): Observable<Group[]> {
     return this.http.get<Group[]>(this.urlService.getUrl() + 'groups/');
   }
+  getGroupById(id: number): Observable<any> {
+    return this.http.get<Group[]>(this.urlService.getUrl() + 'group/' + id + '/id');
+  }
 
   createGroup(name: string, location: string, isopen: boolean, description: string, maxsize: number, dmneeded: boolean): void {
     this.http.post<any>(this.urlService.getUrl() + 'group/', {name: name,
