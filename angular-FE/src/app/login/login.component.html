@@ -1,0 +1,13 @@
+<div class="login">
+    <section>
+        Log in        
+    </section>
+    <app-login-button *ngFor="let loginButton of loginButtonList" [loginButton]="loginButton" [routerLink]="['/landingPage']" skipLocationChange (click)="loginButtonClick(loginButton)"></app-login-button>
+    <div>
+        <form [formGroup]="createUserForm" (submit)="createUser()">
+            <label for="Username">Username</label>
+            <input id="Username" type="text" formControlName="username"/>
+            <input type="submit"/>
+        </form>
+    </div>
+</div>

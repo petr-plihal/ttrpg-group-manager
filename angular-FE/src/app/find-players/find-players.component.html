@@ -1,0 +1,10 @@
+<div>
+    <app-menu></app-menu>
+    <form [formGroup]="SearchUserForm" (keyup)="searchUsers()">
+        <label for="Username">Search</label>
+        <input id="Username" type="text" formControlName="username"/>
+    </form>
+    <div>
+        <app-login-button *ngFor="let loginButton of filteredLoginButtonList" [loginButton]="loginButton" [routerLink]="['playerDetail/', loginButton.id]" skipLocationChange></app-login-button>
+    </div>
+</div>

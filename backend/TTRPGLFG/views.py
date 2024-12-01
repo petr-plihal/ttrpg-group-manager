@@ -27,10 +27,10 @@ def createUser(request):
         json_data = json.loads(request.body)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
-    if not json_data or not hasattr(json_data, 'username') or not json_data['username']:
-        return JsonResponse({'status': 'error', 'message': 'Wrong JSON format'}, status=400)
-
+    
+    #if not json_data or not hasattr(json_data, 'username') or not json_data['username']:
+    #    return JsonResponse({'status': 'error', 'message': 'Wrong JSON format'}, status=400)
+    
     if (User.objects.filter(username=json_data['username']).exists()):
         return JsonResponse({'status': 'error', 'message': 'User already exists'}, status=409)
 
@@ -75,7 +75,7 @@ def createGroup(request):
 
     if (Group.objects.filter(name=json_data['name']).exists()):
         return JsonResponse({'status': 'error', 'message': 'Group already exists'}, status=409)
-
+    
     field_names = [
         field.name for field in Group._meta.fields if field.name != 'id']
     missing_fields = [field for field in field_names if field not in json_data]
