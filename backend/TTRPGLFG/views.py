@@ -1,7 +1,7 @@
 from django.contrib.admin.options import json
 from django.http import JsonResponse
 from django.core.serializers import serialize
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from TTRPGLFG.models import User, Group, Game, Application, Belongsto, Session, Tag, Grouptag, Usertag, Schedule
 
 #####################################################
@@ -423,73 +423,135 @@ def removePlayerPreference(request):
 
 @require_GET
 def getAllUsers(request):
-    users = User.objects.all()
-    users_json = modelAsJson(users)
-    response = {'status': 'success', 'data': users_json}
-    return JsonResponse(response)
+    try:
+        users = User.objects.all()
+        users_json = modelAsJson(users)
+        response = {'status': 'success', 'data': users_json}
+        return JsonResponse(response)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 
 @require_GET
 def getAllGroups(request):
-    groups = Group.objects.all()
-    groups_json = modelAsJson(groups)
-    response = {'status': 'success', 'data': groups_json}
-    return JsonResponse(response)
+    try:
+        groups = Group.objects.all()
+        groups_json = modelAsJson(groups)
+        response = {'status': 'success', 'data': groups_json}
+        return JsonResponse(response)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400) 
 
 
 @require_GET
 def getOpenGroups(request):
-    groups = Group.objects.filter(isopen=True)
-    groups_json = modelAsJson(groups)
-    response = {'status': 'success', 'data': groups_json}
-    return JsonResponse(response)
-
+    try:
+        groups = Group.objects.filter(isopen=True)
+        groups_json = modelAsJson(groups)
+        response = {'status': 'success', 'data': groups_json}
+        return JsonResponse(response)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 # request with /groups/filter_tag/?tags=tag1&tags=tag2&tags=tag3
 @require_GET
 def getGroupsWithTags(request):
-    tags = request.GET.getlist('tags')
-    groups = Group.objects.filter(grouptag__tagid__name__in=tags).distinct()
-    groups_json = modelAsJson(groups)
-    response = {'status': 'success', 'data': groups_json}
-    return JsonResponse(response)
+    try:
+        tags = request.GET.getlist('tags')
+        groups = Group.objects.filter(grouptag__tagid__name__in=tags).distinct()
+        groups_json = modelAsJson(groups)
+        response = {'status': 'success', 'data': groups_json}
+        return JsonResponse(response)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 
 # request with /groups/exclude_tag/?tags=tag1&tags=tag2&tags=tag3
 @require_GET
 def getGroupsWithoutTags(request):
-    tags = request.GET.getlist('tags')
-    groups = Group.objects.exclude(grouptag__tagid__name__in=tags).distinct()
-    groups_json = modelAsJson(groups)
-    response = {'status': 'success', 'data': groups_json}
-    return JsonResponse(response)
+    try:
+        tags = request.GET.getlist('tags')
+        groups = Group.objects.exclude(grouptag__tagid__name__in=tags).distinct()
+        groups_json = modelAsJson(groups)
+        response = {'status': 'success', 'data': groups_json}
+        return JsonResponse(response)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 
 @require_GET
 def getUserSchedule(request, user_id):
-    schedules = Schedule.objects.filter(userid=user_id)
-    schedule_json = modelAsJson(schedules)
-    response = {'status': 'success', 'data': schedule_json}
-    return JsonResponse(response)
+    try:
+        schedules = Schedule.objects.filter(userid=user_id)
+        schedule_json = modelAsJson(schedules)
+        response = {'status': 'success', 'data': schedule_json}
+        return JsonResponse(response)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 
 @require_GET
 def getAppChat(request, app_id):
-    app = Application.objects.get(id=app_id)
-    return JsonResponse(app.appchatcontent, safe=False)
+    try:
+        app = Application.objects.get(id=app_id)
+        return JsonResponse(app.appchatcontent, safe=False)
+    except Application.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Application not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
 
 @require_GET
 def getUserByID(request, user_id: int):
     try:
         user = User.objects.filter(id = user_id)
         user_data = modelAsJson(user)
-
         return JsonResponse({'status': 'success', 'data': user_data})
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 
-############## End of Marek Kozumplk work ##############################
+@require_http_methods(["PUT"])
+def updateUser(request, user_id: int):
+    try:
+        user = User.objects.get(id=user_id)
+        json_data = json.loads(request.body)
+        column_names = [field.name for field in User._meta.fields]
+        for key in json_data:
+            if key not in column_names:
+                return JsonResponse({'status': 'error', 'message': f'Field {key} not found in User model'}, status=400)
+            if key == 'id':
+                return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+            setattr(user, key, json_data[key])
+        user.save()
+        return JsonResponse({'status': 'success', 'message': f'User {user_id} updated'})
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+
+@require_http_methods(["PUT"])
+def updateGroup(request, group_id: int):
+    try:
+        group = Group.objects.get(id = group_id)
+        json_data = json.loads(request.body)
+        column_names = [field.name for field in Group._meta.fields]
+        for key in json_data:
+            if key not in column_names:
+                return JsonResponse({'status': 'error', 'message': f'Field {key} not found in User model'}, status=400)
+            if key == 'id':
+                return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+            setattr(group, key, json_data[key])
+        group.save()
+        return JsonResponse({'status': 'success', 'message': f'Group {group_id} updated'})
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+
+############## End of Marek Kozumplik work ##############################
 
 
 ##########################
