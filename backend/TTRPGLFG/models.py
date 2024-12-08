@@ -6,7 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table (DONE)
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
-
+from django.utils.translation import gettext_lazy as _
 
 class User(models.Model):
     username = models.CharField(unique=True, max_length=30)
@@ -41,7 +41,6 @@ class Group(models.Model):
     maxsize = models.IntegerField()
     dmneeded = models.BooleanField()
     gameid = models.ForeignKey(Game, models.DO_NOTHING, db_column='gameid')
-    groupchatcontent = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -54,7 +53,6 @@ class Application(models.Model):
     applicantid = models.ForeignKey('User', models.CASCADE, db_column='applicantid')
     groupid = models.ForeignKey('Group', models.CASCADE, db_column='groupid')
     description = models.CharField(max_length=600, blank=True, null=True)
-    appchatcontent = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.applicantid} -> {self.groupid}'
@@ -134,3 +132,26 @@ class Usertag(models.Model):
 
     class Meta:
         db_table = 'usertag'
+
+class Chat(models.Model):
+    class chatTypes(models.TextChoices):
+        APPLICATION = 'APP', _('application')
+        GROUP = 'GRP', _('group')
+
+    applicationid = models.ForeignKey(Application, models.CASCADE, db_column='applicationid', null=True)
+    groupid = models.ForeignKey(Group, models.CASCADE, db_column='groupid', null=True)
+    chattype = models.CharField(max_length=3,choices=chatTypes.choices, default=chatTypes.APPLICATION)
+
+class Chatmessage(models.Model):
+    class chatMessageTypes(models.TextChoices):
+        TEXT = 'TXT', _('text')
+        SCHEDULE = 'SCD', _('schedule')
+        PREFS = 'PRF', _('prefs')
+    
+    chatid = models.ForeignKey(Chat, models.CASCADE, db_column='chatid')
+    userid = models.ForeignKey(User, models.CASCADE, db_column='userid')
+    timestamp = models.DateTimeField(null=False)
+    chatmessagetype = models.CharField(max_length=3, choices=chatMessageTypes.choices, default=chatMessageTypes.TEXT)
+    content = models.CharField(max_length=600, null=False)
+
+
