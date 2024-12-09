@@ -37,4 +37,8 @@ urlpatterns = [
     re_path("^group/by/description?$", views.getGroupByDescription, name="getGroupByDescription"),
     re_path("^users/(?P<tag_id>\\d+)/preference/?$", views.getUsersByPreference, name="getUsersByPreference"),
     re_path("^users/(?P<tag_id>\\d+)/avoidance/?$", views.getUsersByAvoidance, name="getUsersByAvoidance"),
+    re_path("^chat/(?P<chat_id>\\d+)?$", views.getChatMessages, name="getChatMessages"),
+    re_path("^chatmessage/create?$", views.createChatMessage, name="createChatMessage"),
+    re_path("^chatmessage/(?P<chatmessage_id>\\d+)/edit?$", views.editChatMessage, name="editChatMessage"),
+    re_path("^chatmessage/(?P<chatmessage_id>\\d+)/delete?$", views.deleteChatMessage, name="deleteChatMessage"),
 ]
