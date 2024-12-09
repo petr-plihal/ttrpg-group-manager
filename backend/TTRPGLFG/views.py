@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.core.serializers import serialize
 from django.views.decorators.http import require_GET, require_POST
 from TTRPGLFG.models import User, Group, Game, Application, Belongsto, Session, Tag, Grouptag, Usertag, Schedule, Chat, Chatmessage
+from datetime import datetime
 
 #####################################################
 # Helper function
@@ -95,7 +96,7 @@ def createGroup(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
     
     chat = Chat()
-    setattr(chat, 'groupid', Group.objects.get(group.name))
+    setattr(chat, 'groupid', group)
     setattr(chat, 'chattype', 'GRP')
 
     try:
@@ -619,7 +620,7 @@ def getGroupChat(request, group_id: int):
     try:
         fetchedChat = Chat.objects.get(groupid=group_id)
 
-        return({'status': 'success', 'data': fetchedChat})
+        return JsonResponse({'status': 'success', 'data': modelAsJson([fetchedChat, ])})
     except Chat.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Chat of group {group_id} not found'}, status=404)
     
@@ -628,13 +629,14 @@ def getAppChat(request, app_id: int):
     try:
         fetchedChat = Chat.objects.get(applicationid=app_id)
 
-        return({'status': 'success', 'data': fetchedChat})
+        return JsonResponse({'status': 'success', 'data': modelAsJson([fetchedChat, ])})
     except Chat.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Chat of application{app_id} not found'}, status=404)
     
 @require_POST
 def createChatMessage(request):
     try:
+        print(request.body)
         jsonData = json.loads(request.body)
         chatId = jsonData.get('chatid')
         userId = jsonData.get('userid')
@@ -646,11 +648,12 @@ def createChatMessage(request):
                 continue
             if (key == 'userid'):
                 setattr(newChatMessage, key, User.objects.get(id=jsonData[key]))
-                continue
+                continue  
             setattr(newChatMessage, key, jsonData[key])
+        setattr(newChatMessage, 'timestamp', datetime.now())
         newChatMessage.save()
 
-        return JsonResponse({'status': 'success', 'data': newChatMessage})
+        return JsonResponse({'status': 'success', 'data': modelAsJson([newChatMessage, ])})
 
     except Chat.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Chat {chatId} not found'}, status=404)
@@ -669,7 +672,7 @@ def editChatMessage(request, chatmessage_id: int):
         setattr(editedChatMessage, 'content', jsonData['content'])
         editedChatMessage.save()
 
-        return JsonResponse({'status': 'success', 'data': editedChatMessage})
+        return JsonResponse({'status': 'success', 'data': modelAsJson([editedChatMessage, ])})
 
     except Chatmessage.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
@@ -691,7 +694,7 @@ def deleteChatMessage(request, chatmessage_id: int):
 def getChatMessages(request, chat_id: int):
     try:
         chats = Chatmessage.objects.filter(chatid=chat_id)
-        return JsonResponse({'status': 'success', 'data': chats})
+        return JsonResponse({'status': 'success', 'data': modelAsJson(chats)})
 
     except Chatmessage.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Chat message {chat_id} not found'}, status=404)
