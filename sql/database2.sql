@@ -209,7 +209,7 @@ CREATE TABLE IF NOT EXISTS `usertag` (
 -- Table `chat`
 -- -----------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `chat` (
+CREATE TABLE IF NOT EXISTS `ttrpglfg_chat` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `applicationid` INT NULL,
   `groupid` INT NULL,
@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS `chat` (
 -- Table `chatmessage`
 -- -----------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `chatmessage` (
+CREATE TABLE IF NOT EXISTS `ttrpglfg_chatmessage` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `chatid` INT NULL,
   `userid` INT NULL,
@@ -355,3 +355,18 @@ INSERT INTO `usertag` (`userid`, `tagid`, `islooking`) VALUES
 (2, 2, 0),
 (3, 3, 1),
 (4, 4, 0);
+
+-- -----------------------------------------------------
+-- Insert data into `chat`
+-- -----------------------------------------------------
+INSERT INTO `ttrpglfg_chat` (`applicationid`, `chattype`) VALUES
+(1, 'APP'),
+(2, 'APP'),
+(3, 'APP'),
+(4, 'APP');
+
+INSERT INTO `ttrpglfg_chat` (`groupid`, `chattype`) VALUES
+(1, 'GRP'),
+(2, 'GRP'),
+(3, 'GRP'),
+(4, 'GRP');
