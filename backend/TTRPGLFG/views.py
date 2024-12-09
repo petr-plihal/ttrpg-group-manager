@@ -692,6 +692,8 @@ def getAppChat(request, app_id: int):
 def createChatMessage(request):
     try:
         jsonData = json.loads(request.body)
+        chatId = jsonData.get('chatid')
+        userId = jsonData.get('userid')
 
         newChatMessage = Chatmessage()
         for key in jsonData:
@@ -707,9 +709,9 @@ def createChatMessage(request):
         return JsonResponse({'status': 'success', 'data': newChatMessage})
 
     except Chat.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Chat {jsonData.get('chatid')} not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': f'Chat {userId} not found'}, status=404)
     except User.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'User {jsonData.get('userid')} not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': f'User {chatId} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     
