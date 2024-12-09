@@ -943,9 +943,9 @@ def createChatMessage(request):
         return JsonResponse({'status': 'success', 'data': newChatMessage})
 
     except Chat.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Chat {userId} not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': f'Chat {chatId} not found'}, status=404)
     except User.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'User {chatId} not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': f'User {userId} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     
@@ -971,6 +971,17 @@ def deleteChatMessage(request, chatmessage_id: int):
     try:
         Chatmessage.objects.get(id=chatmessage_id).delete()
         return JsonResponse({'status': 'success', 'message': f'Chat message {chatmessage_id} has been deleted'})
+
+    except Chatmessage.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def getChatMessages(request, chat_id: int):
+    try:
+        chats = Chatmessage.objects.filter(chatid=chat_id)
+        return JsonResponse({'status': 'success', 'data': chats})
 
     except Chatmessage.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
