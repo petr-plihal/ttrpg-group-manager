@@ -985,7 +985,7 @@ def getChatMessages(request, chat_id: int):
         return JsonResponse({'status': 'success', 'data': chats})
 
     except Chatmessage.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': f'Chat message {chat_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
