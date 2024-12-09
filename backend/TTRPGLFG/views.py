@@ -506,16 +506,10 @@ def getUserSchedule(request, user_id):
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 
-@require_GET
-def getAppChat(request, app_id):
-    try:
-        app = Application.objects.get(id=app_id)
-        return JsonResponse(app.appchatcontent, safe=False)
-    except Application.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Application not found'}, status=404)
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
+#@require_GET
+#def getAppChat(request, app_id):
+ #   app = Application.objects.get(id=app_id)
+ #   return JsonResponse(app.appchatcontent, safe=False)
 
 @require_GET
 def getUserByID(request, user_id: int):
@@ -808,19 +802,6 @@ def createTag(request):
 # Autor: Marek Pechan
 #
 ##########################
-@require_GET
-def getGroupChat(request, group_id: int):
-    try:
-        group = Group.objects.get(id=group_id)
-        groupChat = group.groupchatcontent
-
-        return JsonResponse({'status': 'success', 'data': groupChat})
-
-    except Group.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
 @require_GET
 def getGroupApps(request, group_id: int):
     try:
