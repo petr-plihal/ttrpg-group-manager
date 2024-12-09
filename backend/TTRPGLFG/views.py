@@ -550,6 +550,78 @@ def updateGroup(request, group_id: int):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+@require_GET
+def getUserGroups(request, user_id: int):
+    try:
+        user = User.objects.get(id=user_id)
+        belongsto_entries = Belongsto.objects.filter(userid=user)
+        group_ids = [entry.groupid.id for entry in belongsto_entries]
+        groups = Group.objects.filter(id__in=group_ids)
+        groups_data = modelAsJson(groups)
+        return JsonResponse({'status': 'success', 'data': groups_data})
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def getGroupOwner(request, group_id: int):
+    try:
+        group = Group.objects.get(id=group_id)
+        owner = Belongsto.objects.get(groupid=group, isowner=True)
+        ownerData = modelAsJson([owner])
+
+        return JsonResponse({'status': 'success', 'data': ownerData})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except Belongsto.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Owner of group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def getPlayerPreferences(request, user_id: int):
+    try:
+        user = User.objects.get(id=user_id)
+        userTags = Usertag.objects.filter(userid=user).values_list('tagid', flat=True)
+        tags = Tag.objects.filter(id__in=userTags)
+        tagsData = modelAsJson(tags)
+        return JsonResponse({'status': 'success', 'data': tagsData})
+
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def getGroupTags(request, group_id: int):
+    try:
+        group = Group.objects.get(id=group_id)
+        groupTags = Grouptag.objects.filter(groupid=group).values_list('tagid', flat=True)
+        tags = Tag.objects.filter(id__in=groupTags)
+        tagsData = modelAsJson(tags)
+        return JsonResponse({'status': 'success', 'data': tagsData})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def getUserSessions(request, user_id: int):
+    try:
+        user = User.objects.get(id=user_id)
+        belongsto = Belongsto.objects.filter(userid=user)
+        groupIds = [entry.groupid.id for entry in belongsto]
+        sessions = Session.objects.filter(groupid__in=groupIds)
+        sessionsData = modelAsJson(sessions)
+        return JsonResponse({'status': 'success', 'data': sessionsData})
+
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 ############## End of Marek Kozumplik work ##############################
 
