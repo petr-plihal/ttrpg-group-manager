@@ -688,9 +688,27 @@ def getUsersByAvoidance(request, tag_id: int):
         return JsonResponse({'status': 'error', 'message': f'Group {tag_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_GET   
+def getGroupChat(request, group_id: int):
+    try:
+        fetchedChat = Chat.objects.get(groupid=group_id)
+
+        return({'status': 'success', 'data': fetchedChat})
+    except Chat.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat of group {group_id} not found'}, status=404)
+    
+@require_GET   
+def getAppChat(request, app_id: int):
+    try:
+        fetchedChat = Chat.objects.get(applicationid=app_id)
+
+        return({'status': 'success', 'data': fetchedChat})
+    except Chat.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat of application{app_id} not found'}, status=404)
     
 @require_POST
-def createChatMessage(request: int):
+def createChatMessage(request):
     try:
         jsonData = json.loads(request.body)
 
