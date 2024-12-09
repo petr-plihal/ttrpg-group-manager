@@ -715,14 +715,22 @@ def getGroupApplications(request, group_id: int):
     try:
         group = Group.objects.get(id=group_id)
         applications = Application.objects.filter(groupid=group)
+
         applicationsData = modelAsJson(applications)
+
+        for application in applicationsData:
+            applicant_id = application['fields']['applicantid']
+            applicant = User.objects.get(id=applicant_id)
+            application['fields']['applicant_name'] = applicant.username
+            
         return JsonResponse({'status': 'success', 'data': applicationsData})
 
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
+
 # curl -X GET http://localhost:8000/user/1/applications/
 @require_GET
 def getUserApplications(request, user_id: int):
@@ -730,10 +738,19 @@ def getUserApplications(request, user_id: int):
         user = User.objects.get(id=user_id)
         applications = Application.objects.filter(applicantid=user)
         applicationsData = modelAsJson(applications)
+        
+        # Add group names to the applications data
+        for application in applicationsData:
+            group_id = application['fields']['groupid']
+            group = Group.objects.get(id=group_id)
+            application['fields']['group_name'] = group.name
+        
         return JsonResponse({'status': 'success', 'data': applicationsData})
 
     except User.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Group not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     
