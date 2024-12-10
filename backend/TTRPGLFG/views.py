@@ -2,7 +2,8 @@ from django.contrib.admin.options import json
 from django.http import JsonResponse
 from django.core.serializers import serialize
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
-from TTRPGLFG.models import User, Group, Game, Application, Belongsto, Session, Tag, Grouptag, Usertag, Schedule
+from TTRPGLFG.models import User, Group, Game, Application, Belongsto, Session, Tag, Grouptag, Usertag, Schedule, Chat, Chatmessage
+from datetime import datetime
 
 #####################################################
 # Helper function
@@ -93,6 +94,15 @@ def createGroup(request):
         group.save()
     except Exception:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
+    
+    chat = Chat()
+    setattr(chat, 'groupid', group)
+    setattr(chat, 'chattype', 'GRP')
+
+    try:
+        chat.save()
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': 'Chat failed to create'}, status=400)
 
     return JsonResponse({'status': 'success'})
 
@@ -260,6 +270,13 @@ def applyToGroup(request):
             return JsonResponse({'status': 'info', 'message': f'User {user_id} already has an application for group {group_id}'})
 
         Application.objects.create(groupid=group, applicantid=user, description=description)
+        
+        chat = Chat()
+        setattr(chat, 'applicationid', Application.objects.get(applicantid=user, groupid=group))
+        setattr(chat, 'chattype', 'APP')
+
+        chat.save()
+        
         return JsonResponse({'status': 'success', 'message': f'User {user_id} applied to group {group_id}'})
     
     except Group.DoesNotExist:
@@ -490,16 +507,10 @@ def getUserSchedule(request, user_id):
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 
-@require_GET
-def getAppChat(request, app_id):
-    try:
-        app = Application.objects.get(id=app_id)
-        return JsonResponse(app.appchatcontent, safe=False)
-    except Application.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Application not found'}, status=404)
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
+#@require_GET
+#def getAppChat(request, app_id):
+ #   app = Application.objects.get(id=app_id)
+ #   return JsonResponse(app.appchatcontent, safe=False)
 
 @require_GET
 def getUserByID(request, user_id: int):
@@ -793,19 +804,6 @@ def createTag(request):
 #
 ##########################
 @require_GET
-def getGroupChat(request, group_id: int):
-    try:
-        group = Group.objects.get(id=group_id)
-        groupChat = group.groupchatcontent
-
-        return JsonResponse({'status': 'success', 'data': groupChat})
-
-    except Group.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
-@require_GET
 def getGroupApps(request, group_id: int):
     try:
         group = Group.objects.get(id = group_id)
@@ -904,6 +902,178 @@ def getUsersByAvoidance(request, tag_id: int):
 
     except Tag.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {tag_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_GET   
+def getGroupChat(request, group_id: int):
+    try:
+        fetchedChat = Chat.objects.get(groupid=group_id)
+
+        return JsonResponse({'status': 'success', 'data': modelAsJson([fetchedChat, ])})
+    except Chat.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat of group {group_id} not found'}, status=404)
+    
+@require_GET   
+def getAppChat(request, app_id: int):
+    try:
+        fetchedChat = Chat.objects.get(applicationid=app_id)
+
+        return JsonResponse({'status': 'success', 'data': modelAsJson([fetchedChat, ])})
+    except Chat.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat of application{app_id} not found'}, status=404)
+    
+@require_POST
+def createChatMessage(request):
+    try:
+        print(request.body)
+        jsonData = json.loads(request.body)
+        chatId = jsonData.get('chatid')
+        userId = jsonData.get('userid')
+
+        newChatMessage = Chatmessage()
+        for key in jsonData:
+            if (key == 'chatid'):
+                setattr(newChatMessage, key, Chat.objects.get(id=jsonData[key]))
+                continue
+            if (key == 'userid'):
+                setattr(newChatMessage, key, User.objects.get(id=jsonData[key]))
+                continue  
+            setattr(newChatMessage, key, jsonData[key])
+        setattr(newChatMessage, 'timestamp', datetime.now())
+        newChatMessage.save()
+
+        return JsonResponse({'status': 'success', 'data': modelAsJson([newChatMessage, ])})
+
+    except Chat.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat {chatId} not found'}, status=404)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {userId} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_POST
+def editChatMessage(request, chatmessage_id: int):
+    try:
+        jsonData = json.loads(request.body)
+        editedChatMessage = Chatmessage.objects.get(id=chatmessage_id)
+        if editedChatMessage.chatmessagetype == 'PRF' or editedChatMessage.chatmessagetype == 'SCD':
+            return JsonResponse({'status': 'error', 'message': 'Cannot edit messages of types: preferences, schedule'}, status=400)
+        setattr(editedChatMessage, 'content', jsonData['content'])
+        editedChatMessage.save()
+
+        return JsonResponse({'status': 'success', 'data': modelAsJson([editedChatMessage, ])})
+
+    except Chatmessage.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def deleteChatMessage(request, chatmessage_id: int):
+    try:
+        Chatmessage.objects.get(id=chatmessage_id).delete()
+        return JsonResponse({'status': 'success', 'message': f'Chat message {chatmessage_id} has been deleted'})
+
+    except Chatmessage.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def getChatMessages(request, chat_id: int):
+    try:
+        chats = Chatmessage.objects.filter(chatid=chat_id)
+        return JsonResponse({'status': 'success', 'data': modelAsJson(chats)})
+
+    except Chatmessage.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat message {chat_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_GET   
+def getGroupChat(request, group_id: int):
+    try:
+        fetchedChat = Chat.objects.get(groupid=group_id)
+
+        return JsonResponse({'status': 'success', 'data': modelAsJson([fetchedChat, ])})
+    except Chat.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat of group {group_id} not found'}, status=404)
+    
+@require_GET   
+def getAppChat(request, app_id: int):
+    try:
+        fetchedChat = Chat.objects.get(applicationid=app_id)
+
+        return JsonResponse({'status': 'success', 'data': modelAsJson([fetchedChat, ])})
+    except Chat.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat of application{app_id} not found'}, status=404)
+    
+@require_POST
+def createChatMessage(request):
+    try:
+        print(request.body)
+        jsonData = json.loads(request.body)
+        chatId = jsonData.get('chatid')
+        userId = jsonData.get('userid')
+
+        newChatMessage = Chatmessage()
+        for key in jsonData:
+            if (key == 'chatid'):
+                setattr(newChatMessage, key, Chat.objects.get(id=jsonData[key]))
+                continue
+            if (key == 'userid'):
+                setattr(newChatMessage, key, User.objects.get(id=jsonData[key]))
+                continue  
+            setattr(newChatMessage, key, jsonData[key])
+        setattr(newChatMessage, 'timestamp', datetime.now())
+        newChatMessage.save()
+
+        return JsonResponse({'status': 'success', 'data': modelAsJson([newChatMessage, ])})
+
+    except Chat.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat {chatId} not found'}, status=404)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'User {userId} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_POST
+def editChatMessage(request, chatmessage_id: int):
+    try:
+        jsonData = json.loads(request.body)
+        editedChatMessage = Chatmessage.objects.get(id=chatmessage_id)
+        if editedChatMessage.chatmessagetype == 'PRF' or editedChatMessage.chatmessagetype == 'SCD':
+            return JsonResponse({'status': 'error', 'message': 'Cannot edit messages of types: preferences, schedule'}, status=400)
+        setattr(editedChatMessage, 'content', jsonData['content'])
+        editedChatMessage.save()
+
+        return JsonResponse({'status': 'success', 'data': modelAsJson([editedChatMessage, ])})
+
+    except Chatmessage.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def deleteChatMessage(request, chatmessage_id: int):
+    try:
+        Chatmessage.objects.get(id=chatmessage_id).delete()
+        return JsonResponse({'status': 'success', 'message': f'Chat message {chatmessage_id} has been deleted'})
+
+    except Chatmessage.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def getChatMessages(request, chat_id: int):
+    try:
+        chats = Chatmessage.objects.filter(chatid=chat_id)
+        return JsonResponse({'status': 'success', 'data': modelAsJson(chats)})
+
+    except Chatmessage.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Chat message {chat_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
