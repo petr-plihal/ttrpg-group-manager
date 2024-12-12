@@ -56,4 +56,7 @@ urlpatterns = [
     re_path("^chatmessage/create/?$", views.createChatMessage, name="createChatMessage"),
     re_path("^chatmessage/(?P<chatmessage_id>\\d+)/edit/?$", views.editChatMessage, name="editChatMessage"),
     re_path("^chatmessage/(?P<chatmessage_id>\\d+)/delete/?$", views.deleteChatMessage, name="deleteChatMessage"),
+    re_path("^schedule/create/?$", views.createSchedule, name="createSchedule"),
+    re_path("^schedule/(?P<sched_id>\\d+)/edit/?$", views.editSchedule, name="editSchedule"),
+    re_path("^schedule/(?P<sched_id>\\d+)/delete/?$", views.deleteSchedule, name="deleteSchedule"),
 ]
