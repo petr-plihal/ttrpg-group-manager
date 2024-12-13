@@ -1,0 +1,43 @@
+.loginButton{
+    background-color: #D9D9D9;
+    border: none;
+    width: 100%;
+    height: 3vh;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.loginButton:hover{
+    background-color: #afafaf;
+    border: none;
+    width: 100%;
+    height: 3vh;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.loginButton:active{
+    background-color: #444444;
+    border: none;
+    width: 100%;
+    height: 3vh;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.buttonImg{
+    width: 10%;
+    height: 90%;
+    background-color: black;
+    border-radius: 50%;
+    margin: 0px;
+    display: inline-block;
+}
+.buttonText{
+    padding-left: 5px;
+}
