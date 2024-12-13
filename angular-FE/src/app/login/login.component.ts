@@ -32,7 +32,7 @@ export class LoginComponent {
   createUser() {  
     if(this.createUserForm.value.username != undefined && this.createUserForm.value.username != ''){
       this.UsersService.createUser(this.createUserForm.value.username ?? '');
-      this.loginButtonList.push({id: this.loginButtonList.length+1,name: this.createUserForm.value.username});
+      this.loginButtonList.push({id: this.loginButtonList.length+1,name: this.createUserForm.value.username, imageurl: ""});
     }
   }
 
@@ -43,7 +43,8 @@ export class LoginComponent {
       for(let i = 0; i < usersList.data.length; i++){
         this.loginButtonList.push({
           id: usersList.data[i].pk,
-          name: usersList.data[i].fields.username
+          name: usersList.data[i].fields.username,
+          imageurl: usersList.data[i].fields.profilePic ?? ''
         })
       };
     });
