@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.core.serializers import serialize
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from TTRPGLFG.models import User, Group, Game, Application, Belongsto, Session, Tag, Grouptag, Usertag, Schedule, Chat, Chatmessage
-from datetime import datetime
+from datetime import datetime,time
 
 #####################################################
 # Helper function
@@ -1085,11 +1085,19 @@ def createSchedule(request):
     try:
         jsonData = json.loads(request.body)
         userid = jsonData['userid']
-        user = User.objects.get(id=jsonData['userid'])
+        starttime = time.fromisoformat(jsonData['starttime'])
+        endtime = time.fromisoformat(jsonData['endtime'])
         newSchedule = Schedule()
         for key in jsonData:
             if key == 'userid':
-                setattr(newSchedule, key, user)
+                setattr(newSchedule, key, User.objects.get(id=userid))
+                continue
+            if key == 'starttime':
+                setattr(newSchedule, key, starttime)
+                continue
+            if key == 'endtime':
+                setattr(newSchedule, key, endtime)
+                continue
             setattr(newSchedule, key, jsonData[key])
         newSchedule.save()
 
@@ -1100,26 +1108,29 @@ def createSchedule(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+#curl -X POST "http://127.0.0.1:8000/schedule/1/edit/" -H "Content-Type: application/json" -d "{\"starttime\": \"00:25:43.511\", \"endtime\": \"12:45:13.511\"}"
 #this endpoint changes the start time and end time, nothing else
 @require_POST
 def editSchedule(request, sched_id: int):
     try:
         jsonData = json.loads(request.body)
         editedSched = Schedule.objects.get(id=sched_id)
-        setattr(editedSched, 'starttime', jsonData['starttime'])
-        setattr(editedSched, 'endtime', jsonData['endtime'])
+        setattr(editedSched, 'starttime', time.fromisoformat(jsonData['starttime']))
+        setattr(editedSched, 'endtime', time.fromisoformat(jsonData['endtime']))
         editedSched.save()
         return JsonResponse({'status': 'success', 'data': modelAsJson([editedSched, ])})
 
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
+#curl -X GET "http://127.0.0.1:8000/schedule/5/delete/"    
 @require_GET
 def deleteSchedule(request, sched_id: int):
     try:
         Schedule.objects.get(id=sched_id).delete()
         return JsonResponse({'status': 'success', 'data': f'Schedule {sched_id} has been deleted'})
-
+    except Schedule.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
