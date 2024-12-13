@@ -104,7 +104,7 @@ def createGroup(request):
     except Exception:
         return JsonResponse({'status': 'error', 'message': 'Chat failed to create'}, status=400)
 
-    return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'success', 'groupid': group.id})
 
 
 @require_GET
@@ -176,10 +176,10 @@ def acceptApplication(request, application_id: int):
     if not application:
         return JsonResponse({'error': 'Application not found'}, status=404)
 
-    group = Group.objects.get(id=application.groupid)
-    user = User.objects.get(id=application.applicantid)
+    group = Group.objects.get(id=application.groupid.id)
+    user = User.objects.get(id=application.applicantid.id)
     Belongsto.objects.create(userid=user, groupid=group, isowner=False)
-
+    application.delete()
     return JsonResponse({'status': 'success'})
 
 
@@ -695,7 +695,10 @@ def setGroupOwner(request, group_id: int):
     except User.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
     except Belongsto.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Membership of user {user_id} and group {group_id} not found'}, status=404)
+        membership = Belongsto(groupid=group, userid=user)
+        membership.isowner = True
+        membership.save()
+        return JsonResponse({'status': 'success', 'message': f'User {user_id} set as owner of group {group_id}'})
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
@@ -789,7 +792,7 @@ def createTag(request):
             
         tag = Tag(name=json_data['name'])
         tag.save()
-        return JsonResponse({'status': 'success', 'message': f'Tag {tag.name} created'})
+        return JsonResponse({'status': 'success', 'message': f'Tag {tag.name} created', 'tagid': tag.pk})
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     except Exception as e:
