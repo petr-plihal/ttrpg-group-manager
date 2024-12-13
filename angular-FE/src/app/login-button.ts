@@ -1,4 +1,5 @@
 export interface LoginButton {
     id: number,
-    name: string
+    name: string,
+    imageurl?: string
 }
