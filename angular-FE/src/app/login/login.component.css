@@ -1,9 +1,28 @@
 .login{
-    height: fit-content;
+    height: 35vh;
     width: 20vw;
     background-color: #606470;
     position: relative;
     align-content: space-between;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 5px;
+}
+.tit{
+}
+.loginButtonContainer{
+    width: 100%;
+    display: flex;
+    align-self: flex-start;
+    flex-direction: column;
+}
+
+.loginButtonItem{
+    margin: 7px;
+}
+.loginForm{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
