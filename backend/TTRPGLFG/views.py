@@ -50,7 +50,7 @@ def createUser(request):
     except Exception:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
 
-    return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'success', 'data': modelAsJson([user, ])})
 
 
 @require_GET
@@ -1048,6 +1048,21 @@ def deleteSchedule(request, sched_id: int):
         return JsonResponse({'status': 'success', 'data': f'Schedule {sched_id} has been deleted'})
     except Schedule.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+# curl -X GET http://localhost:8000/user/1/tags/
+@require_GET
+def getUserTags(request, user_id: int):
+    try:
+        user = User.objects.get(id=user_id)
+        userTags = Usertag.objects.filter(userid=user).values_list('tagid', flat=True)
+        tags = Tag.objects.filter(id__in=userTags)
+        tagsData = modelAsJson(tags)
+        return JsonResponse({'status': 'success', 'data': tagsData})
+
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {user_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 

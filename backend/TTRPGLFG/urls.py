@@ -59,4 +59,5 @@ urlpatterns = [
     re_path("^schedule/create/?$", views.createSchedule, name="createSchedule"),
     re_path("^schedule/(?P<sched_id>\\d+)/edit/?$", views.editSchedule, name="editSchedule"),
     re_path("^schedule/(?P<sched_id>\\d+)/delete/?$", views.deleteSchedule, name="deleteSchedule"),
+    re_path("^user/(?P<user_id>\\d+)/tags/?$", views.getUserTags, name="getUserTags"),
 ]
