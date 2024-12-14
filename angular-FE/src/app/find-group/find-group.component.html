@@ -1,7 +1,11 @@
-<div>
+<div class="column">
     <app-menu class="leftSticky"></app-menu>
-    <div>
-        <app-group-item *ngFor="let group of groupList" [group]="group" [routerLink]="['groupDetail/', group.id]"/>
+    <div class="title">Find groups</div>
+    <form>
+        <input type="text" class="search" [formControl]="searchGroupName" (input)="searchGroup()" placeholder="Search..."/>
+    </form>   
+    <div class="groups">
+        <app-group-item *ngFor="let group of filteredList" [group]="group" [routerLink]="['groupDetail/', group.id]" skipLocationChange/>
     </div>
 </div>
 

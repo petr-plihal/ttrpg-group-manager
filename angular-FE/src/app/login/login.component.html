@@ -9,6 +9,7 @@
         <form [formGroup]="createUserForm" (submit)="createUser()" class="loginForm">
             <label for="Username">Create new user:</label>
             <input id="Username" type="text" formControlName="username" placeholder="Username" class="inputUsernameForm"/>
+            <div *ngIf='errorMsg != ""' class="errorText"> {{errorMsg}} </div>
             <input type="submit" class="submitButton" value="Create new user"/>
         </form>
     </div>
