@@ -56,6 +56,7 @@ export class FindGroupComponent {
     this.loggedUser = this.UsersService.getLoggedInUser();
     this.GroupsService.getAllGroups().subscribe((groupsList: any) => {
       for(let i = 0; i < groupsList.data.length; i++){
+        console.log(groupsList)
         this.groupList.push({
           id: groupsList.data[i].pk,
           name: groupsList.data[i].fields.name,
