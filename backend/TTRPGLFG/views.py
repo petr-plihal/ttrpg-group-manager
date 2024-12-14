@@ -153,6 +153,16 @@ def createGame(request):
 
 
 @require_GET
+def getGameByID(request, game_id):
+    try:
+        game = Game.objects.filter(id=game_id)
+        game_data = modelAsJson(game)
+        return JsonResponse({'status': 'success', 'data': game_data})
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+
+@require_GET
 def getGroupByLanguage(request, languages: str):
     group = Group.objects.filter(languages=languages)
 
