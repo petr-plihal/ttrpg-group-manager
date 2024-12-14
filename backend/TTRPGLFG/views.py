@@ -994,9 +994,8 @@ def createChatMessage(request):
                         Chat.objects.get(id=jsonData[key]))
                 continue
             if (key == 'userid'):
-                setattr(newChatMessage, key,
-                        User.objects.get(id=jsonData[key]))
-                continue
+                setattr(newChatMessage, key, User.objects.get(id=jsonData[key]))
+                continue  
             setattr(newChatMessage, key, jsonData[key])
         setattr(newChatMessage, 'timestamp', datetime.now())
         newChatMessage.save()
