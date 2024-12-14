@@ -1,5 +1,5 @@
 .login{
-    height: 35vh;
+    height: 40vh;
     width: 20vw;
     background-color: #606470;
     position: relative;
@@ -11,6 +11,10 @@
     border-radius: 5px;
 }
 .tit{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    font-size: large;
 }
 .loginButtonContainer{
     width: 100%;
@@ -25,4 +29,45 @@
 .loginForm{
     display: flex;
     flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+.inputUsernameForm{
+    border: none;
+    width: 100%;
+    height: 2vh;
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.submitButton{
+    background-color: #D9D9D9;
+    max-width: fit-content;
+    border: none;
+    height: 3vh;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.submitButton:hover{
+    background-color: #afafaf;
+    max-width: fit-content;
+    border: none;
+    height: 3vh;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.submitButton:active{
+    background-color: #444444;
+    max-width: fit-content;
+    border: none;
+    height: 3vh;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
