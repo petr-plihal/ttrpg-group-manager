@@ -31,8 +31,7 @@ export class GroupDetailsComponent {
         languages: Group.data[0].fields.languages,
         maxsize: Group.data[0].fields.maxsize,
         dmneeded: Group.data[0].fields.dmneeded,
-        gameid: Group.data[0].fields.gameid,
-        groupchatcontent: Group.data[0].fields.groupchatcontent
+        gameid: Group.data[0].fields.gameid
       }
     })
   }
