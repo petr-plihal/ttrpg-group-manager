@@ -17,6 +17,13 @@ export class UsersService {
   loggedInUser?: User;
 
   urlService: BackendUrlService = inject(BackendUrlService);
+
+  isLoggedIn(): boolean {
+    if(this.loggedInUser === null || this.loggedInUser?.id === -1){
+      return false;
+    } 
+    return true;
+  }
   getAllLoginButtons(): Observable<any> {
     return this.http.get<any>(this.urlService.getUrl() + 'users/');
   }
