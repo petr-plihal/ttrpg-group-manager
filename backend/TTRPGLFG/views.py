@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.core.serializers import serialize
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from TTRPGLFG.models import User, Group, Game, Application, Belongsto, Session, Tag, Grouptag, Usertag, Schedule, Chat, Chatmessage
-from datetime import datetime,time
+from datetime import datetime, time
 
 #####################################################
 # Helper function
@@ -28,10 +28,10 @@ def createUser(request):
         json_data = json.loads(request.body)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
-    #if not json_data or not hasattr(json_data, 'username') or not json_data['username']:
+
+    # if not json_data or not hasattr(json_data, 'username') or not json_data['username']:
     #    return JsonResponse({'status': 'error', 'message': 'Wrong JSON format'}, status=400)
-    
+
     if (User.objects.filter(username=json_data['username']).exists()):
         return JsonResponse({'status': 'error', 'message': 'User already exists'}, status=409)
 
@@ -76,7 +76,7 @@ def createGroup(request):
 
     if (Group.objects.filter(name=json_data['name']).exists()):
         return JsonResponse({'status': 'error', 'message': 'Group already exists'}, status=409)
-    
+
     field_names = [
         field.name for field in Group._meta.fields if field.name != 'id']
     missing_fields = [field for field in field_names if field not in json_data]
@@ -94,7 +94,7 @@ def createGroup(request):
         group.save()
     except Exception:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
-    
+
     chat = Chat()
     setattr(chat, 'groupid', group)
     setattr(chat, 'chattype', 'GRP')
@@ -198,20 +198,21 @@ def denyApplication(request, application_id: int):
 #
 ##########################
 
+
 @require_POST
 def kickPlayer(request):
     try:
         json_data = json.loads(request.body)
         group_id = json_data.get('group_id')
         user_id = json_data.get('user_id')
-        
+
         group = Group.objects.get(id=group_id)
         user = User.objects.get(id=user_id)
         membership = Belongsto.objects.get(groupid=group, userid=user)
 
         membership.delete()
         return JsonResponse({'status': 'success', 'message': f'User {user_id} kicked from group {group_id}'})
-    
+
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
     except User.DoesNotExist:
@@ -221,34 +222,38 @@ def kickPlayer(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+
 @require_POST
 def invitePlayer(request):
     try:
         json_data = json.loads(request.body)
         group_id = json_data.get('group_id')
         user_id = json_data.get('user_id')
-        description = json_data.get('description', '')  # Default to an empty string if not provided
-        
+        # Default to an empty string if not provided
+        description = json_data.get('description', '')
+
         group = Group.objects.get(id=group_id)
         user = User.objects.get(id=user_id)
 
         # Check if user is already a member of the group
         if Belongsto.objects.filter(groupid=group, userid=user).exists():
             return JsonResponse({'status': 'info', 'message': f'User {user_id} is already a member of group {group_id}'})
-        
+
         # Check if user already has an application for this group
         if Application.objects.filter(groupid=group, applicantid=user).exists():
             return JsonResponse({'status': 'info', 'message': f'User {user_id} already has an application for group {group_id}'})
-        
-        Application.objects.create(groupid=group, applicantid=user, description=description)
+
+        Application.objects.create(
+            groupid=group, applicantid=user, description=description)
         return JsonResponse({'status': 'success', 'message': f'Application created for user {user_id} to join group {group_id}'})
-    
+
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
     except User.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
 
 @require_POST
 def applyToGroup(request):
@@ -256,29 +261,32 @@ def applyToGroup(request):
         json_data = json.loads(request.body)
         group_id = json_data.get('group_id')
         user_id = json_data.get('user_id')
-        description = json_data.get('description', '') # Defaults to an empty string if not provided
-        
+        # Defaults to an empty string if not provided
+        description = json_data.get('description', '')
+
         group = Group.objects.get(id=group_id)
         user = User.objects.get(id=user_id)
 
         # Check if user is already a member of the group
         if Belongsto.objects.filter(groupid=group, userid=user).exists():
             return JsonResponse({'status': 'info', 'message': f'User {user_id} is already a member of group {group_id}'})
-        
+
         # Check if user already has an application for this group
         if Application.objects.filter(groupid=group, applicantid=user).exists():
             return JsonResponse({'status': 'info', 'message': f'User {user_id} already has an application for group {group_id}'})
 
-        Application.objects.create(groupid=group, applicantid=user, description=description)
-        
+        Application.objects.create(
+            groupid=group, applicantid=user, description=description)
+
         chat = Chat()
-        setattr(chat, 'applicationid', Application.objects.get(applicantid=user, groupid=group))
+        setattr(chat, 'applicationid', Application.objects.get(
+            applicantid=user, groupid=group))
         setattr(chat, 'chattype', 'APP')
 
         chat.save()
-        
+
         return JsonResponse({'status': 'success', 'message': f'User {user_id} applied to group {group_id}'})
-    
+
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
     except User.DoesNotExist:
@@ -286,20 +294,21 @@ def applyToGroup(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+
 @require_POST
 def cancelApplication(request):
     try:
         json_data = json.loads(request.body)
         group_id = json_data.get('group_id')
         user_id = json_data.get('user_id')
-        
+
         group = Group.objects.get(id=group_id)
         user = User.objects.get(id=user_id)
         application = Application.objects.get(groupid=group, applicantid=user)
 
         application.delete()
         return JsonResponse({'status': 'success', 'message': f'Application of user {user_id} to group {group_id} cancelled'})
-    
+
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
     except User.DoesNotExist:
@@ -309,6 +318,7 @@ def cancelApplication(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+
 @require_GET
 def getGroupSessions(request, group_id):
     try:
@@ -317,11 +327,12 @@ def getGroupSessions(request, group_id):
         sessions_data = modelAsJson(sessions)
 
         return JsonResponse({'status': 'success', 'data': sessions_data})
-    
+
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
 
 @require_POST
 def addGroupTags(request):
@@ -329,21 +340,21 @@ def addGroupTags(request):
         json_data = json.loads(request.body)
         group_id = json_data.get('group_id')
         tag_ids = json_data.get('tag_ids')
-        
+
         group = Group.objects.get(id=group_id)
-        
+
         # Check if all tags exist
         tags = Tag.objects.filter(id__in=tag_ids)
         if tags.count() != len(tag_ids):
             return JsonResponse({'status': 'error', 'message': 'One or more tags not found'}, status=404)
-        
+
         # Add tags to group only if they don't already exist
         added_tags = []
         for tag in tags:
             if not Grouptag.objects.filter(groupid=group, tagid=tag).exists():
                 Grouptag.objects.create(groupid=group, tagid=tag)
                 added_tags.append(tag.id)
-        
+
         if added_tags:
             return JsonResponse({'status': 'success', 'message': f'Tags {added_tags} added to group {group_id}'})
         else:
@@ -354,27 +365,28 @@ def addGroupTags(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+
 @require_POST
 def removeGroupTags(request):
     try:
         json_data = json.loads(request.body)
         group_id = json_data.get('group_id')
         tag_ids = json_data.get('tag_ids')
-        
+
         group = Group.objects.get(id=group_id)
-        
+
         # Check if all tags exist
         tags = Tag.objects.filter(id__in=tag_ids)
         if tags.count() != len(tag_ids):
             return JsonResponse({'status': 'error', 'message': 'One or more tags not found'}, status=404)
-        
+
         removed_tags = []
         for tag in tags:
             grouptag = Grouptag.objects.get(groupid=group, tagid=tag)
             grouptag.delete()
             removed_tags.append(tag.id)
         return JsonResponse({'status': 'success', 'message': f'Tags {removed_tags} removed from group {group_id}'})
-    
+
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
     except Tag.DoesNotExist:
@@ -384,6 +396,7 @@ def removeGroupTags(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+
 @require_POST
 def addPlayerPreference(request):
     try:
@@ -391,17 +404,17 @@ def addPlayerPreference(request):
         user_id = json_data.get('user_id')
         tag_id = json_data.get('tag_id')
         islooking = json_data.get('islooking')
-        
+
         user = User.objects.get(id=user_id)
         tag = Tag.objects.get(id=tag_id)
-        
+
         # Only add the tag if it doesn't already exist
         if not Usertag.objects.filter(userid=user, tagid=tag).exists():
             Usertag.objects.create(userid=user, tagid=tag, islooking=islooking)
             return JsonResponse({'status': 'success', 'message': f'Tag {tag_id} added to user {user_id} preferences'})
         else:
             return JsonResponse({'status': 'info', 'message': f'Tag {tag_id} already exists for user {user_id}'})
-        
+
     except User.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
     except Tag.DoesNotExist:
@@ -409,20 +422,21 @@ def addPlayerPreference(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+
 @require_POST
 def removePlayerPreference(request):
     try:
         json_data = json.loads(request.body)
         user_id = json_data.get('user_id')
         tag_id = json_data.get('tag_id')
-        
+
         user = User.objects.get(id=user_id)
         tag = Tag.objects.get(id=tag_id)
         usertag = Usertag.objects.get(userid=user, tagid=tag)
 
         usertag.delete()
         return JsonResponse({'status': 'success', 'message': f'Tag {tag_id} removed from user {user_id} preferences'})
-    
+
     except User.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
     except Tag.DoesNotExist:
@@ -437,6 +451,7 @@ def removePlayerPreference(request):
 # Autor: Marek Kozumplik
 #
 ##########################
+
 
 @require_GET
 def getAllUsers(request):
@@ -457,7 +472,7 @@ def getAllGroups(request):
         response = {'status': 'success', 'data': groups_json}
         return JsonResponse(response)
     except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400) 
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 
 @require_GET
@@ -471,11 +486,14 @@ def getOpenGroups(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 # request with /groups/filter_tag/?tags=tag1&tags=tag2&tags=tag3
+
+
 @require_GET
 def getGroupsWithTags(request):
     try:
         tags = request.GET.getlist('tags')
-        groups = Group.objects.filter(grouptag__tagid__name__in=tags).distinct()
+        groups = Group.objects.filter(
+            grouptag__tagid__name__in=tags).distinct()
         groups_json = modelAsJson(groups)
         response = {'status': 'success', 'data': groups_json}
         return JsonResponse(response)
@@ -488,7 +506,8 @@ def getGroupsWithTags(request):
 def getGroupsWithoutTags(request):
     try:
         tags = request.GET.getlist('tags')
-        groups = Group.objects.exclude(grouptag__tagid__name__in=tags).distinct()
+        groups = Group.objects.exclude(
+            grouptag__tagid__name__in=tags).distinct()
         groups_json = modelAsJson(groups)
         response = {'status': 'success', 'data': groups_json}
         return JsonResponse(response)
@@ -507,15 +526,15 @@ def getUserSchedule(request, user_id):
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 
-#@require_GET
-#def getAppChat(request, app_id):
+# @require_GET
+# def getAppChat(request, app_id):
  #   app = Application.objects.get(id=app_id)
  #   return JsonResponse(app.appchatcontent, safe=False)
 
 @require_GET
 def getUserByID(request, user_id: int):
     try:
-        user = User.objects.filter(id = user_id)
+        user = User.objects.filter(id=user_id)
         user_data = modelAsJson(user)
         return JsonResponse({'status': 'success', 'data': user_data})
     except json.JSONDecodeError:
@@ -540,12 +559,12 @@ def updateUser(request, user_id: int):
         return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
 
 @require_http_methods(["PUT"])
 def updateGroup(request, group_id: int):
     try:
-        group = Group.objects.get(id = group_id)
+        group = Group.objects.get(id=group_id)
         json_data = json.loads(request.body)
         column_names = [field.name for field in Group._meta.fields]
         for key in json_data:
@@ -593,13 +612,16 @@ def getGroupOwner(request, group_id: int):
         return JsonResponse({'status': 'error', 'message': f'Owner of group {group_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
 # curl -X GET http://localhost:8000/user/1/preferences/
+
+
 @require_GET
 def getPlayerPreferences(request, user_id: int):
     try:
         user = User.objects.get(id=user_id)
-        userTags = Usertag.objects.filter(userid=user).values_list('tagid', flat=True)
+        userTags = Usertag.objects.filter(
+            userid=user).values_list('tagid', flat=True)
         tags = Tag.objects.filter(id__in=userTags)
         tagsData = modelAsJson(tags)
         return JsonResponse({'status': 'success', 'data': tagsData})
@@ -608,13 +630,16 @@ def getPlayerPreferences(request, user_id: int):
         return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
 # curl -X GET http://localhost:8000/group/1/tags/
+
+
 @require_GET
 def getGroupTags(request, group_id: int):
     try:
         group = Group.objects.get(id=group_id)
-        groupTags = Grouptag.objects.filter(groupid=group).values_list('tagid', flat=True)
+        groupTags = Grouptag.objects.filter(
+            groupid=group).values_list('tagid', flat=True)
         tags = Tag.objects.filter(id__in=groupTags)
         tagsData = modelAsJson(tags)
         return JsonResponse({'status': 'success', 'data': tagsData})
@@ -623,8 +648,10 @@ def getGroupTags(request, group_id: int):
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
 # curl -X GET http://localhost:8000/user/3/sessions/
+
+
 @require_GET
 def getUserSessions(request, user_id: int):
     try:
@@ -639,8 +666,10 @@ def getUserSessions(request, user_id: int):
         return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
 # curl -X GET http://localhost:8000/user/1/ownedGroups/
+
+
 @require_GET
 def getOwnedGroups(request, user_id: int):
     try:
@@ -655,8 +684,10 @@ def getOwnedGroups(request, user_id: int):
         return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
 # curl -X DELETE http://localhost:8000/group/5/delete -H "Content-Type: application/json"
+
+
 @require_http_methods(["DELETE"])
 def deleteGroup(request, group_id: int):
     try:
@@ -710,7 +741,7 @@ def setGroupUserNickname(request, group_id: int):
         json_data = json.loads(request.body)
         user_id = json_data.get('user_id')
         nickname = json_data.get('nickname')
-        
+
         group = Group.objects.get(id=group_id)
         user = User.objects.get(id=user_id)
         membership = Belongsto.objects.get(groupid=group, userid=user)
@@ -721,8 +752,8 @@ def setGroupUserNickname(request, group_id: int):
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
     except User.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'User {user_id} not found'}, status=404)
-        
-    
+
+
 # curl -X GET http://localhost:8000/group/1/applications/
 @require_GET
 def getGroupApplications(request, group_id: int):
@@ -736,7 +767,7 @@ def getGroupApplications(request, group_id: int):
             applicant_id = application['fields']['applicantid']
             applicant = User.objects.get(id=applicant_id)
             application['fields']['applicant_name'] = applicant.username
-            
+
         return JsonResponse({'status': 'success', 'data': applicationsData})
 
     except Group.DoesNotExist:
@@ -752,13 +783,13 @@ def getUserApplications(request, user_id: int):
         user = User.objects.get(id=user_id)
         applications = Application.objects.filter(applicantid=user)
         applicationsData = modelAsJson(applications)
-        
+
         # Add group names to the applications data
         for application in applicationsData:
             group_id = application['fields']['groupid']
             group = Group.objects.get(id=group_id)
             application['fields']['group_name'] = group.name
-        
+
         return JsonResponse({'status': 'success', 'data': applicationsData})
 
     except User.DoesNotExist:
@@ -767,8 +798,10 @@ def getUserApplications(request, user_id: int):
         return JsonResponse({'status': 'error', 'message': 'Group not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
 # curl GET http://localhost:8000/tags/
+
+
 @require_GET
 def getAllTags(request):
     try:
@@ -777,7 +810,6 @@ def getAllTags(request):
         return JsonResponse({'status': 'success', 'data': tagsData})
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
 
 
 # curl -X POST http://localhost:8000/tag/create/      -H "Content-Type: application/json"      -d '{"name": "new_tag_name"}'
@@ -789,7 +821,7 @@ def createTag(request):
             return JsonResponse({'status': 'error', 'message': 'Missing name field'}, status=400)
         if Tag.objects.filter(name=json_data['name']).exists():
             return JsonResponse({'status': 'error', 'message': 'Tag already exists'}, status=409)
-            
+
         tag = Tag(name=json_data['name'])
         tag.save()
         return JsonResponse({'status': 'success', 'message': f'Tag {tag.name} created', 'tagid': tag.pk})
@@ -809,8 +841,8 @@ def createTag(request):
 @require_GET
 def getGroupApps(request, group_id: int):
     try:
-        group = Group.objects.get(id = group_id)
-        groupApps = Application.objects.filter(groupid = group)
+        group = Group.objects.get(id=group_id)
+        groupApps = Application.objects.filter(groupid=group)
         groupAppsData = modelAsJson(groupApps)
 
         return JsonResponse({'status': 'success', 'data': groupAppsData})
@@ -820,12 +852,14 @@ def getGroupApps(request, group_id: int):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-#returns the belongsto rows, to get users another endpoint needs to be called
+# returns the belongsto rows, to get users another endpoint needs to be called
+
+
 @require_GET
 def getGroupPlayers(request, group_id: int):
     try:
-        group = Group.objects.get(id = group_id)
-        groupPlayers = Belongsto.objects.filter(groupid = group)
+        group = Group.objects.get(id=group_id)
+        groupPlayers = Belongsto.objects.filter(groupid=group)
         groupPlayerData = modelAsJson(groupPlayers)
 
         return JsonResponse({'status': 'success', 'data': groupPlayerData})
@@ -835,11 +869,12 @@ def getGroupPlayers(request, group_id: int):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+
 @require_GET
 def getGroupByID(request, group_id: int):
-    
+
     try:
-        group = Group.objects.filter(id = group_id)
+        group = Group.objects.filter(id=group_id)
         groupData = modelAsJson(group)
 
         return JsonResponse({'status': 'success', 'data': groupData})
@@ -849,10 +884,11 @@ def getGroupByID(request, group_id: int):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+
 @require_GET
 def getGroupByName(request, group_name: str):
     try:
-        group = Group.objects.filter(name = group_name)
+        group = Group.objects.filter(name=group_name)
         groupData = modelAsJson(group)
 
         return JsonResponse({'status': 'success', 'data': groupData})
@@ -862,15 +898,17 @@ def getGroupByName(request, group_name: str):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-#this endpoint expects the description to be sent in plaintext as the body of the request
+# this endpoint expects the description to be sent in plaintext as the body of the request
+
+
 @require_GET
 def getGroupByDescription(request):
     if not request.body:
         return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
-    
+
     try:
         body_decode = request.body.decode('utf-8')
-        group = Group.objects.filter(description = body_decode)
+        group = Group.objects.filter(description=body_decode)
         groupData = modelAsJson(group)
 
         return JsonResponse({'status': 'success', 'data': groupData})
@@ -880,11 +918,12 @@ def getGroupByDescription(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
+
 @require_GET
 def getUsersByPreference(request, tag_id: int):
     try:
-        tag = Tag.objects.get(id = tag_id)
-        tagUsers = Usertag.objects.filter(tagid = tag, islooking = True)
+        tag = Tag.objects.get(id=tag_id)
+        tagUsers = Usertag.objects.filter(tagid=tag, islooking=True)
         tagUsersData = modelAsJson(tagUsers)
 
         return JsonResponse({'status': 'success', 'data': tagUsersData})
@@ -893,12 +932,13 @@ def getUsersByPreference(request, tag_id: int):
         return JsonResponse({'status': 'error', 'message': f'Group {tag_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
 
 @require_GET
 def getUsersByAvoidance(request, tag_id: int):
     try:
-        tag = Tag.objects.get(id = tag_id)
-        tagUsers = Usertag.objects.filter(tagid = tag, islooking = False)
+        tag = Tag.objects.get(id=tag_id)
+        tagUsers = Usertag.objects.filter(tagid=tag, islooking=False)
         tagUsersData = modelAsJson(tagUsers)
 
         return JsonResponse({'status': 'success', 'data': tagUsersData})
@@ -908,7 +948,8 @@ def getUsersByAvoidance(request, tag_id: int):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-@require_GET   
+
+@require_GET
 def getGroupChat(request, group_id: int):
     try:
         fetchedChat = Chat.objects.get(groupid=group_id)
@@ -916,8 +957,9 @@ def getGroupChat(request, group_id: int):
         return JsonResponse({'status': 'success', 'data': modelAsJson([fetchedChat, ])})
     except Chat.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Chat of group {group_id} not found'}, status=404)
-    
-@require_GET   
+
+
+@require_GET
 def getAppChat(request, app_id: int):
     try:
         fetchedChat = Chat.objects.get(applicationid=app_id)
@@ -925,7 +967,8 @@ def getAppChat(request, app_id: int):
         return JsonResponse({'status': 'success', 'data': modelAsJson([fetchedChat, ])})
     except Chat.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Chat of application{app_id} not found'}, status=404)
-    
+
+
 @require_POST
 def createChatMessage(request):
     try:
@@ -937,97 +980,13 @@ def createChatMessage(request):
         newChatMessage = Chatmessage()
         for key in jsonData:
             if (key == 'chatid'):
-                setattr(newChatMessage, key, Chat.objects.get(id=jsonData[key]))
+                setattr(newChatMessage, key,
+                        Chat.objects.get(id=jsonData[key]))
                 continue
             if (key == 'userid'):
-                setattr(newChatMessage, key, User.objects.get(id=jsonData[key]))
-                continue  
-            setattr(newChatMessage, key, jsonData[key])
-        setattr(newChatMessage, 'timestamp', datetime.now())
-        newChatMessage.save()
-
-        return JsonResponse({'status': 'success', 'data': modelAsJson([newChatMessage, ])})
-
-    except Chat.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Chat {chatId} not found'}, status=404)
-    except User.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'User {userId} not found'}, status=404)
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
-@require_POST
-def editChatMessage(request, chatmessage_id: int):
-    try:
-        jsonData = json.loads(request.body)
-        editedChatMessage = Chatmessage.objects.get(id=chatmessage_id)
-        if editedChatMessage.chatmessagetype == 'PRF' or editedChatMessage.chatmessagetype == 'SCD':
-            return JsonResponse({'status': 'error', 'message': 'Cannot edit messages of types: preferences, schedule'}, status=400)
-        setattr(editedChatMessage, 'content', jsonData['content'])
-        editedChatMessage.save()
-
-        return JsonResponse({'status': 'success', 'data': modelAsJson([editedChatMessage, ])})
-
-    except Chatmessage.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
-@require_GET
-def deleteChatMessage(request, chatmessage_id: int):
-    try:
-        Chatmessage.objects.get(id=chatmessage_id).delete()
-        return JsonResponse({'status': 'success', 'message': f'Chat message {chatmessage_id} has been deleted'})
-
-    except Chatmessage.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
-@require_GET
-def getChatMessages(request, chat_id: int):
-    try:
-        chats = Chatmessage.objects.filter(chatid=chat_id)
-        return JsonResponse({'status': 'success', 'data': modelAsJson(chats)})
-
-    except Chatmessage.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Chat message {chat_id} not found'}, status=404)
-    except json.JSONDecodeError:
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
-@require_GET   
-def getGroupChat(request, group_id: int):
-    try:
-        fetchedChat = Chat.objects.get(groupid=group_id)
-
-        return JsonResponse({'status': 'success', 'data': modelAsJson([fetchedChat, ])})
-    except Chat.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Chat of group {group_id} not found'}, status=404)
-    
-@require_GET   
-def getAppChat(request, app_id: int):
-    try:
-        fetchedChat = Chat.objects.get(applicationid=app_id)
-
-        return JsonResponse({'status': 'success', 'data': modelAsJson([fetchedChat, ])})
-    except Chat.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': f'Chat of application{app_id} not found'}, status=404)
-    
-@require_POST
-def createChatMessage(request):
-    try:
-        print(request.body)
-        jsonData = json.loads(request.body)
-        chatId = jsonData.get('chatid')
-        userId = jsonData.get('userid')
-
-        newChatMessage = Chatmessage()
-        for key in jsonData:
-            if (key == 'chatid'):
-                setattr(newChatMessage, key, Chat.objects.get(id=jsonData[key]))
+                setattr(newChatMessage, key,
+                        User.objects.get(id=jsonData[key]))
                 continue
-            if (key == 'userid'):
-                setattr(newChatMessage, key, User.objects.get(id=jsonData[key]))
-                continue  
             setattr(newChatMessage, key, jsonData[key])
         setattr(newChatMessage, 'timestamp', datetime.now())
         newChatMessage.save()
@@ -1059,7 +1018,8 @@ def editChatMessage(request, chatmessage_id: int):
         return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
+
 @require_GET
 def deleteChatMessage(request, chatmessage_id: int):
     try:
@@ -1070,7 +1030,8 @@ def deleteChatMessage(request, chatmessage_id: int):
         return JsonResponse({'status': 'error', 'message': f'Chat message {chatmessage_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
+
 @require_GET
 def getChatMessages(request, chat_id: int):
     try:
@@ -1082,7 +1043,9 @@ def getChatMessages(request, chat_id: int):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-#curl -X POST "http://127.0.0.1:8000/schedule/create/" -H "Content-Type: application/json" -d "{\"userid\": 1, \"day\": \"Mo\", \"starttime\": \"12:25:43.511\", \"endtime\": \"18:25:43.511\"}" 
+# curl -X POST "http://127.0.0.1:8000/schedule/create/" -H "Content-Type: application/json" -d "{\"userid\": 1, \"day\": \"Mo\", \"starttime\": \"12:25:43.511\", \"endtime\": \"18:25:43.511\"}"
+
+
 @require_POST
 def createSchedule(request):
     try:
@@ -1111,22 +1074,28 @@ def createSchedule(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-#curl -X POST "http://127.0.0.1:8000/schedule/1/edit/" -H "Content-Type: application/json" -d "{\"starttime\": \"00:25:43.511\", \"endtime\": \"12:45:13.511\"}"
-#this endpoint changes the start time and end time, nothing else
+# curl -X POST "http://127.0.0.1:8000/schedule/1/edit/" -H "Content-Type: application/json" -d "{\"starttime\": \"00:25:43.511\", \"endtime\": \"12:45:13.511\"}"
+# this endpoint changes the start time and end time, nothing else
+
+
 @require_POST
 def editSchedule(request, sched_id: int):
     try:
         jsonData = json.loads(request.body)
         editedSched = Schedule.objects.get(id=sched_id)
-        setattr(editedSched, 'starttime', time.fromisoformat(jsonData['starttime']))
-        setattr(editedSched, 'endtime', time.fromisoformat(jsonData['endtime']))
+        setattr(editedSched, 'starttime',
+                time.fromisoformat(jsonData['starttime']))
+        setattr(editedSched, 'endtime',
+                time.fromisoformat(jsonData['endtime']))
         editedSched.save()
         return JsonResponse({'status': 'success', 'data': modelAsJson([editedSched, ])})
 
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-#curl -X GET "http://127.0.0.1:8000/schedule/5/delete/"    
+# curl -X GET "http://127.0.0.1:8000/schedule/5/delete/"
+
+
 @require_GET
 def deleteSchedule(request, sched_id: int):
     try:
