@@ -3,7 +3,7 @@ venv/
 
 # Ignore compiled Python files
 *.pyc
-__pycache__/
+*__pycache__*
 
 # Ignore SQLite database file
 db.sqlite3
