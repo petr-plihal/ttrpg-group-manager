@@ -5,4 +5,8 @@
   <div *ngIf="!group.dmneeded" class="dmHere">Has DM</div>
   <div *ngIf="group.isopen" class="dmMissing">Open!</div>
   <div *ngIf="!group.isopen" class="dmHere">Closed</div>
+  <div class="tags">
+    <div *ngFor="let tag of tags" class="tag">{{ tag.name }}</div>
+  </div>
+  <div class="descriptions">{{ description }}</div>
 </div>

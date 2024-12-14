@@ -50,7 +50,7 @@ def createUser(request):
     except Exception:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
 
-    return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'success', 'data': modelAsJson([user, ])})
 
 
 @require_GET
