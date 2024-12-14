@@ -97,13 +97,13 @@ INSERT INTO `usertag` (`userid`, `tagid`, `islooking`) VALUES
 -- -----------------------------------------------------
 -- Insert data into `chat`
 -- -----------------------------------------------------
-INSERT INTO `ttrpglfg_chat` (`applicationid`, `chattype`) VALUES
+INSERT INTO `TTRPGLFG_chat` (`applicationid`, `chattype`) VALUES
 (1, 'APP'),
 (2, 'APP'),
 (3, 'APP'),
 (4, 'APP');
 
-INSERT INTO `ttrpglfg_chat` (`groupid`, `chattype`) VALUES
+INSERT INTO `TTRPGLFG_chat` (`groupid`, `chattype`) VALUES
 (1, 'GRP'),
 (2, 'GRP'),
 (3, 'GRP'),
