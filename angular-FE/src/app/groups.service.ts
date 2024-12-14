@@ -3,6 +3,7 @@ import { BackendUrlService } from './backend-url.service';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Group } from './group';
+import { Header } from './header';
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +13,11 @@ export class GroupsService {
 
   urlService: BackendUrlService = inject(BackendUrlService);
 
-  getAllGroups(): Observable<Group[]> {
-    return this.http.get<Group[]>(this.urlService.getUrl() + 'groups/');
+  getAllGroups(): Observable<Header> {
+    return this.http.get<Header>(this.urlService.getUrl() + 'groups/');
   }
-  getGroupById(id: number): Observable<any> {
-    return this.http.get<Group[]>(this.urlService.getUrl() + 'group/' + id + '/id');
+  getGroupById(id: number): Observable<Header> {
+    return this.http.get<Header>(this.urlService.getUrl() + 'group/' + id + '/id');
   }
 
   createGroup(name: string, location: string, isopen: boolean, description: string, maxsize: number, dmneeded: boolean): void {

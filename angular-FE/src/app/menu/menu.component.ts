@@ -2,13 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { UsersService } from '../users.service';
-import {MatSidenavModule} from '@angular/material/sidenav';
 import { User } from '../user';
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [RouterLink, CommonModule, MatSidenavModule],
+  imports: [RouterLink, CommonModule],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.css'
 })

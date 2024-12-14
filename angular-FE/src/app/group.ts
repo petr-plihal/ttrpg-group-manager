@@ -8,5 +8,4 @@ export interface Group {
     maxsize: number,
     dmneeded: boolean,
     gameid?: number,
-    groupchatcontent?: string
 }
