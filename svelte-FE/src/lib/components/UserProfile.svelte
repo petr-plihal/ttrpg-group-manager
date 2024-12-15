@@ -3,6 +3,7 @@
     import { api } from '$lib/api/api';
     import { page } from '$app/stores';
     import { userAuth } from '$lib/components/Auth';
+    import { goto } from '$app/navigation';
     import { User, Calendar, Users } from 'lucide-svelte';
 
     let userID = $derived($page.params.userID ? Number($page.params.userID) : null);
@@ -45,6 +46,15 @@
             loading = false;
         }
     });
+
+    function edit() {
+        goto(`/users/${userID}/edit`);
+    }
+
+    function logout() {
+        userAuth.set(null);
+        goto('/users/login');
+    }
 </script>
 
 {#if loading}
@@ -56,6 +66,13 @@
         </div>
     </div>
 {:else if user}
+
+    <button  
+        onclick={logout}
+        class="bg-blue-500 text-white p-2 m-4 rounded-md hover:bg-blue-600 transition-colors right-0 absolute"
+    > 
+        Log out
+    </button> 
     <div class="w-full max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
         <div class="p-6 text-center">
             <div class="mb-6">
@@ -116,6 +133,17 @@
             </div>
         </div>
     </div>
+
+    {#if $userAuth == userID}
+    <div class="w-full max-w-md mx-auto mt-5 bg-white shadow-lg rounded-lg overflow-hidden">
+        <button  
+            onclick={edit}
+            class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors" 
+        > 
+            Edit profile
+        </button> 
+    </div>
+    {/if}
 {:else if error}
     <div class="w-full max-w-md mx-auto bg-white shadow-lg rounded-lg p-6">
         <p class="text-red-500 text-center">{error}</p>

@@ -1,3 +1,3 @@
 import { writable } from 'svelte/store';
 
-export let userAuth = writable(null);
+export let userAuth = writable(2);

@@ -1,10 +1,15 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { api } from '$lib/api/api';
+    import { page } from '$app/stores';
     import { onMount } from 'svelte';
     import { userAuth } from '$lib/components/Auth';
-    import { GamepadIcon, MapPin, Users, Languages, Tag, Gamepad2 } from 'lucide-svelte';
+    import { GamepadIcon, MapPin, Users, User, Languages, Tag, Gamepad2 } from 'lucide-svelte';
 
+    let groupID = $derived($page.params.groupID ? Number($page.params.groupID) : null);
+    let group = $state(null);
+    let members = $state(null);
+    let appliedUsers = $state(null);
     let games = $state([]);
     let tags = $state([]);
     let loading = $state(true);
@@ -23,7 +28,27 @@
     let selectedTags = $state([]);
 
     onMount(async () => {
+        if (groupID == null) {
+            error = 'No group ID provided';
+            loading = false;
+            return;
+        }
+
         try {
+            let groupData = await api.getGroupByID(groupID);
+            if (!groupData.data.length) {
+                throw new Error("Group not found");
+            }
+            group = groupData.data[0].fields;
+
+            form.name = group.name;
+            form.description = group.description;
+            form.location = group.location;
+            form.isopen = group.isopen;
+            form.languages = group.languages;
+            form.maxsize = group.maxsize;
+            form.dmneeded = group.dmneeded;
+
             // Fetch games
             let gamesData = await api.getAllGames();
             games = gamesData.data.map(game => { return {...game.fields, id: game.pk}});
@@ -31,6 +56,33 @@
             // Fetch tags
             let tagsData = await api.getAllTags();
             tags = tagsData.data.map(tag => { return {...tag.fields, id: tag.pk}});
+
+            // Fill tags
+            let groupTagsData = await api.getGroupTags(groupID);
+            selectedTags  = groupTagsData.data.map(tag => tag.pk);
+
+            // Fetch group members
+            let membersData = await api.getGroupPlayers(groupID);
+            members = await Promise.all(membersData.data.map(async (memberData) => {
+                let member = await api.getUserByID(memberData.fields.userid);
+                return {
+                    ...member.data[0].fields,
+                    id: member.data[0].pk,
+                    nickname: memberData.fields.nickname,
+                    isowner: memberData.fields.isowner,
+                };
+            }));
+
+            let applicationsData = await api.getGroupApplications(groupID);
+            let applications = applicationsData.data.map(app => { return { ...app.fields, id: app.pk }});
+            appliedUsers = await Promise.all(applications.map(async (app) => {
+                let user = await api.getUserByID(app.applicantid);
+                return {
+                    ...user.data[0].fields,
+                    applicationid: app.id
+                };
+            }));
+
         } catch (error) {
             console.error('Failed to load initial data', error);
         } finally {
@@ -38,23 +90,15 @@
         }
     });
 
-    async function createGroup(event: Event) {
-        event.preventDefault();
+    async function update(event: Event) {
         try {
-            const newGroup = await api.createGroup({
-                ...form,
-            });
+            const newGroup = await api.updateGroup(groupID, form);
 
             if (newGroup.status == "error") {
                 throw "error";
             }
 
-            await api.addGroupTags({group_id: newGroup.groupid, tag_ids: selectedTags});
-            const application = await api.applyToGroup({group_id: newGroup.groupid, user_id: $userAuth});
-            await api.acceptApplication(application.applicationid);
-            await api.setGroupOwner(newGroup.groupid, {'user_id': $userAuth});
-
-            goto(`/groups/${newGroup.groupid}`);
+            goto(`/groups/${groupID}`);
         } catch (error) {
             console.error('Group creation failed', error);
         }
@@ -65,6 +109,19 @@
             ? selectedTags.filter(t => t !== tag.id)
             : [...selectedTags, tag.id];
     }
+
+    async function kick(player) {
+        await api.kickPlayer({'group_id': groupID,'user_id': player});
+    }
+
+    async function reject(player) {
+        await api.denyApplication(player);
+    }
+
+    async function approve(player) {
+        await api.acceptApplication(player);
+    }
+
 </script>
 
 {#if loading}
@@ -76,6 +133,76 @@
         </div>
     </div>
 {:else}
+    <div class="left-0 absolute">
+        <h3>Members:</h3>
+        {#if members?.length}
+            <div class="space-y-4 m-4">
+                {#each members as member}
+                    <div class="bg-gray-100 p-2 rounded-md flex items-center mb-2">
+                        {#if member.profilePicture}
+                            <img 
+                                src={member.profilePicture}
+                                alt={member.username}
+                                class="w-5 h-5 rounded-full mr-3 object-cover"
+                            />
+                        {:else}
+                            <User class="mr-2 text-blue-500" size={20} />
+                        {/if}
+                        <span class="font-medium text-gray-700">
+                            {member.nickname || member.username}
+                            {#if member.isowner}
+                                <span class="text-xs text-blue-500 ml-2">(Owner)</span>
+                            {:else}
+                                <button
+                                    onclick={() => kick(member.id)}
+                                    class="bg-red-500 px-2 rounded-md hover:bg-red-600 transition-colors"
+                                >
+                                    Kick Player
+                                </button>
+                            {/if}
+                        </span>
+                    </div>
+                {/each}
+            </div>
+        {:else}
+            <p class="text-gray-500">No members</p>
+        {/if}
+        <h3>Applications:</h3>
+        {#if appliedUsers?.length}
+            <div class="space-y-4 m-4">
+                {#each appliedUsers as user}
+                    <div class="bg-gray-100 p-2 rounded-md flex items-center mb-2">
+                        {#if user.profilePicture}
+                            <img 
+                                src={user.profilePicture}
+                                alt={user.username}
+                                class="w-5 h-5 rounded-full mr-3 object-cover"
+                            />
+                        {:else}
+                            <User class="mr-2 text-blue-500" size={20} />
+                        {/if}
+                        <span class="font-medium text-gray-700">
+                            {user.username}
+                            <button
+                                onclick={() => reject(user.applicationid)}
+                                class="bg-red-500 px-2 rounded-md hover:bg-red-600 transition-colors"
+                            >
+                                Reject
+                            </button>
+                            <button
+                                onclick={() => approve(user.applicationid)}
+                                class="bg-blue-500 px-2 rounded-md hover:bg-blue-600 transition-colors"
+                            >
+                                Approve
+                            </button>
+                        </span>
+                    </div>
+                {/each}
+            </div>
+        {:else}
+            <p class="text-gray-500">No applications</p>
+        {/if}
+    </div>
 <div class="container mx-auto px-4 py-8 max-w-md">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
         <div class="p-6">
@@ -83,9 +210,9 @@
                 <Gamepad2 size={64} class="text-blue-500" />
             </div>
 
-            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Create a New Group</h2>
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Edit group information</h2>
 
-            <form class="space-y-4" onsubmit={createGroup}> 
+            <form class="space-y-4" onsubmit={update}> 
                 <input  
                     type="text" 
                     bind:value={form.name}  
@@ -189,7 +316,7 @@
                     type="submit"  
                     class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors" 
                 > 
-                    Create Group 
+                    Save changes
                 </button> 
             </form> 
         </div>

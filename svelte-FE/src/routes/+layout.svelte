@@ -7,14 +7,14 @@
 
 
     <nav class="navbar">
-        <div class="logo">Your Logo</div>
+        <div class="logo">TTRPGLFG</div>
 
         <ul class="nav-links">
             <li><a href="/groups">Groups</a></li>
             {#if $userAuth}
                 <li><a href="/users/{$userAuth}">Account</a></li>
             {:else}
-                <li><a href="/users/create">Log In</a></li>
+                <li><a href="/users/login">Log In</a></li>
             {/if}
         </ul>
     </nav>

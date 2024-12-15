@@ -3,9 +3,15 @@
     import { api } from '$lib/api/api';
     import { onMount } from 'svelte';
     import { userAuth } from '$lib/components/Auth';
+    import { page } from '$app/stores';
     import { User, Mail, Lock, Globe, CalendarDays } from 'lucide-svelte';
 
+    let userID = $derived($page.params.userID ? Number($page.params.userID) : null);
+    let loading = $state(true);
     let failed = $state(false);
+    let user = $state(null);
+    let schedule = $state(null);
+    let scheduleID = $state(0);
 
     let form = $state({
         username: '',
@@ -29,41 +35,74 @@
         { day: 'Sunday', starttime: '', endtime: '' }
     ]);
 
+    onMount(async () => {
+        try {
+            let userData = await api.getUserByID(userID);
+            if (!userData.data.length) {
+                throw new Error("User not found");
+            }
+            user = userData.data[0].fields;
+
+            form.username = user.username
+            form.email = user.email
+            form.password = user.password
+            form.confirmPassword = user.confirmPassword
+            form.description = user.description
+            form.timezone = user.timezone
+            form.availability = user.availability
+            form.candm = user.candm
+            form.profilepicture = user.profilepicture
+
+
+            let scheduleData = await api.getUserSchedule(userID);
+            schedule = scheduleData.data.map((data) => data.fields);
+
+            let daymap = {
+                'mo': 'Monday',
+                'tu': 'Tuesday',
+                'we': 'Wednesday',
+                'th': 'Thursday',
+                'fr': 'Friday',
+                'sa': 'Saturday',
+                'su': 'Sunday',
+            }
+
+            schedule.forEach(sch => {
+                availabilitySlots.map(slot => {
+                    if (slot.day == daymap[sch.day]) {
+                        slot.starttime = sch.starttime;
+                        slot.endtime = sch.endtime;
+                    }
+                    return slot;
+                });
+            });
+
+        } catch (error) {
+            console.error('Failed to load user', error);
+        } finally {
+            loading = false;
+        }
+    });
+
     function updateAvailability(index, field, value) {
         availabilitySlots[index][field] = value;
     }
 
-    async function createUser(event: Event) {
-        event.preventDefault();
+    async function updateUser(event: Event) {
 
-        let daymap = {
-            'Monday': 'mo',
-            'Tuesday': 'tu',
-            'Wednesday': 'we',
-            'Thursday': 'th',
-            'Friday': 'fr',
-            'Saturday': 'sa',
-            'Sunday': 'su',
-        }
-        
         // Filter out availability slots with no times
         const filteredAvailability = availabilitySlots.filter(
             slot => slot.starttime && slot.endtime
-        ).map(slot => {slot.day = daymap[slot.day]; return slot;});
+        );
 
         try {
-            const newUser = await api.createUser(form);
+            const newUser = await api.updateUser(userID, form);
 
             if (newUser.status === "error") {
                 throw new Error("User creation failed");
             }
 
-            for (let i = 0; i < filteredAvailability.length; i++) {
-                await api.createSchedule({...filteredAvailability[i], userid: newUser.userid});
-            }
-
-            userAuth.set(newUser.userid);
-            goto(`/users/${newUser.userid}`);
+            goto(`/users/${userID}`);
         } catch (error) {
             console.error('User creation failed', error);
             failed = true;
@@ -71,6 +110,15 @@
     }
 </script>
 
+{#if loading}
+    <div class="w-full max-w-md mx-auto bg-white shadow-lg rounded-lg p-6 animate-pulse">
+        <div class="flex flex-col items-center">
+            <div class="w-32 h-32 bg-gray-200 rounded-full mb-4"></div>
+            <div class="h-6 w-48 bg-gray-200 rounded mb-2"></div>
+            <div class="h-4 w-64 bg-gray-200 rounded"></div>
+        </div>
+    </div>
+{:else}
 <div class="container mx-auto px-4 py-8 max-w-md">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
         <div class="p-6">
@@ -78,19 +126,9 @@
                 <User size={64} class="text-blue-500" />
             </div>
 
-            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Create a New User</h2>
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">{user.username}</h2>
 
-            <form class="space-y-4" onsubmit={createUser}> 
-                <div class="flex items-center">
-                    <User class="mr-2 text-blue-500" size={20} />
-                    <input  
-                        type="text" 
-                        bind:value={form.username}  
-                        placeholder="Username"  
-                        required  
-                        class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                    /> 
-                </div>
+            <form class="space-y-4" onsubmit={updateUser}> 
 
                 <textarea  
                     bind:value={form.description}  
@@ -142,7 +180,7 @@
                     type="submit"  
                     class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors" 
                 > 
-                    Create User 
+                    Save Changes
                 </button> 
             </form> 
                 {#if failed}
@@ -153,3 +191,4 @@
         </div>
     </div>
 </div>
+{/if}

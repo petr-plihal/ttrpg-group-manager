@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { api } from '$lib/api/api';
+    import { goto } from '$app/navigation';
     import { page } from '$app/stores';
     import { userAuth } from '$lib/components/Auth';
     import { User, Users, GamepadIcon, MapPin, Languages, Tag } from 'lucide-svelte';
@@ -13,6 +14,9 @@
     let sessions = $state(null);
     let loading = $state(true);
     let error = $state(null);
+    let isMember = $state(false);
+    let isOwner = $state(false);
+    let applied = $state(false);
 
     onMount(async () => {
         if (groupID == null) {
@@ -45,6 +49,21 @@
                 };
             }));
 
+            if (members.map(member => member.id).includes($userAuth)) {
+                let groupMember = members.filter(member => member.id == $userAuth);
+                if (groupMember[0].isowner) {
+                    isOwner = true;
+                }
+                isMember = true;
+            }
+
+            let applicationsData = await api.getUserApplications($userAuth);
+            let appliedUsers = applicationsData.data.map(app => app.fields.groupid);
+
+            if (appliedUsers.includes(groupID)) {
+                applied = true;
+            }
+
             // Fetch group tags
             let tagData = await api.getGroupTags(groupID);
             tags = tagData.data.map((tag) => tag.fields.name);
@@ -59,6 +78,15 @@
             loading = false;
         }
     });
+
+    async function join() {
+        await api.applyToGroup({group_id: groupID, user_id: $userAuth});
+        applied = true;
+    }
+
+    async function edit() {
+        goto(`/groups/${groupID}/edit`);
+    }
 </script>
 
 {#if loading}
@@ -181,12 +209,28 @@
                 </div>
             {/if}
         </div>
-        <button
-            type="submit"
-            class="mb-3 mx-auto bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-300 transition-colors"
-        >
-            Join Group
-        </button>
+    </div>
+
+    <div class="w-full max-w-md mx-auto mt-5 bg-white shadow-lg rounded-lg overflow-hidden">
+        {#if isMember}
+            {#if isOwner}
+                <button  
+                    onclick={edit}
+                    class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors" 
+                > 
+                    Edit Group
+                </button> 
+            {/if}
+        {:else if applied}
+            <p class="text-blue-500 text-center py-4">You applied to this group, now wait for confirmation</p>
+        {:else}
+            <button  
+                onclick={join}
+                class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors" 
+            > 
+                Join Group
+            </button> 
+        {/if}
     </div>
 {:else if error}
     <div class="w-full max-w-md mx-auto bg-white shadow-lg rounded-lg p-6">
