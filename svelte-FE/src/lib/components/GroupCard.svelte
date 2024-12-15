@@ -8,11 +8,11 @@
         name: '',
         description: '',
         location: '',
-        isOpen: true,
+        isopen: true,
         languages: '',
-        maxSize: 6,
-        dmNeeded: false,
-        gameId: null,
+        maxsize: 6,
+        dmneeded: false,
+        gameid: 1,
         tags: []
     };
 
@@ -21,7 +21,12 @@
 
     onMount(async () => {
         try {
-            games = await api.getGames(); // Assuming you have this method
+            games = [];
+            let next_game = await api.getGameByID(0);
+            for (let i = 1; next_game.status == "success"; i++) {
+                games.append(next_game.data[0].fields);
+                next_game = await api.getGameByID(i);
+            }
             tags = await api.getAllTags();
         } catch (error) {
             console.error('Failed to load initial data', error);
@@ -47,7 +52,7 @@
     }
 </script>
 
-<form on:submit|preventDefault={createGroup}>
+<form onsubmit={createGroup}>
     <input 
         bind:value={form.name} 
         placeholder="Group Name" 
@@ -63,6 +68,7 @@
         {#each games as game}
             <option value={game.id}>{game.name}</option>
         {/each}
+        <option value=1>game one</option>
     </select>
 
     <input 
