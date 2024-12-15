@@ -60,4 +60,6 @@ urlpatterns = [
     re_path("^schedule/create/?$", views.createSchedule, name="createSchedule"),
     re_path("^schedule/(?P<sched_id>\\d+)/edit/?$", views.editSchedule, name="editSchedule"),
     re_path("^schedule/(?P<sched_id>\\d+)/delete/?$", views.deleteSchedule, name="deleteSchedule"),
+    re_path("^group/(?P<group_id>\\d+)/dm/(?P<user_id>\\d+)/?$", views.changeDM, name="changeDM"),
+    re_path("^group/(?P<group_id>\\d+)/owner/(?P<user_id>\\d+)/?$", views.changeOwner, name="changeOwner"),
 ]

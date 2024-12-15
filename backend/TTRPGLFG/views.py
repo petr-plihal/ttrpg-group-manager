@@ -1115,5 +1115,51 @@ def deleteSchedule(request, sched_id: int):
         return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+
+@require_GET
+def deleteSchedule(request, sched_id: int):
+    try:
+        Schedule.objects.get(id=sched_id).delete()
+        return JsonResponse({'status': 'success', 'data': f'Schedule {sched_id} has been deleted'})
+    except Schedule.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+# curl -X GET "http://127.0.0.1:8000/group/1/owner/2/"    
+@require_GET
+def changeOwner(request, group_id: int, user_id: int):
+    try:
+        originalOwner = Belongsto.objects.get(groupid = group_id, isdm = True)
+        nextOwner = Belongsto.objects.get(groupid = group_id, userid = user_id)
+        setattr(nextOwner, 'isowner', True)
+        setattr(originalOwner, 'isowner', False)
+        print(originalOwner)
+        print(nextOwner)
+        originalOwner.save()
+        nextOwner.save()
+        return JsonResponse({'status': 'success', 'data': f'User {user_id} is now the Owner of group {group_id}'})
+    except Belongsto.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Provided player does not exist'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+# curl -X GET "http://127.0.0.1:8000/group/3/dm/4/" 
+@require_GET
+def changeDM(request, group_id: int, user_id: int):
+    try:
+        originalDM = Belongsto.objects.get(groupid = group_id, isdm = True)
+        nextDM = Belongsto.objects.get(groupid = group_id, userid = user_id)
+        setattr(nextDM, 'isdm', True)
+        setattr(originalDM, 'isdm', False)
+        originalDM.save()
+        nextDM.save()
+
+        return JsonResponse({'status': 'success', 'data': f'User {user_id} is now the DM of group {group_id}'})
+    except Belongsto.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 ############## End of Marek Pechan work ##############################

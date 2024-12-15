@@ -37,15 +37,15 @@ INSERT INTO `application` (`applicantid`, `groupid`, `description`) VALUES
 -- -----------------------------------------------------
 -- Insert data into `belongsto`
 -- -----------------------------------------------------
-INSERT INTO `belongsto` (`userid`, `groupid`, `isowner`, `nickname`) VALUES
-(1, 1, 1, 'Dungeon Master'),
-(2, 2, 1, 'Pathfinder Leader'),
-(3, 3, 1, 'Catan Champion'),
-(4, 4, 1, 'Risk Master'),
-(2, 1, 0, 'Nikkita'),
-(3, 2, 0, ''),
-(4, 3, 0, ''),
-(1, 4, 0, 'Player2');
+INSERT INTO `belongsto` (`userid`, `groupid`, `isowner`, `isdm`, `nickname`) VALUES
+(1, 1, 1, 1, 'Dungeon Master'),
+(2, 2, 1, 1, 'Pathfinder Leader'),
+(3, 3, 1, 1, 'Catan Champion'),
+(4, 4, 1, 1, 'Risk Master'),
+(2, 1, 0, 0, 'Nikkita'),
+(3, 2, 0, 0, ''),
+(4, 3, 0, 0, ''),
+(1, 4, 0, 0, 'Player2');
 
 -- -----------------------------------------------------
 -- Insert data into `tag`
