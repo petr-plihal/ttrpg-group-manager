@@ -1115,5 +1115,38 @@ def deleteSchedule(request, sched_id: int):
         return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+
+@require_GET
+def deleteSchedule(request, sched_id: int):
+    try:
+        Schedule.objects.get(id=sched_id).delete()
+        return JsonResponse({'status': 'success', 'data': f'Schedule {sched_id} has been deleted'})
+    except Schedule.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def changeOwner(request, group_id: int, user_id: int):
+    try:
+        setattr(Belongsto.objects.get(groupid = group_id, isowner = True), 'isowner', False)
+        setattr(Belongsto.objects.get(groupid = group_id, userid = user_id), 'isowner', True)
+        return JsonResponse({'status': 'success', 'data': f'Schedule {sched_id} has been deleted'})
+    except Schedule.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@require_GET
+def changeDM(request, group_id: int, user_id: int):
+    try:
+        setattr(Belongsto.objects.get(groupid = group_id, isdm = True), 'isdm', False)
+        setattr(Belongsto.objects.get(groupid = group_id, userid = user_id), 'isdm', True)
+        return JsonResponse({'status': 'success', 'data': f'Schedule {sched_id} has been deleted'})
+    except Schedule.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 ############## End of Marek Pechan work ##############################
