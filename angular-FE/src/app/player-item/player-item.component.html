@@ -1,9 +1,9 @@
 <div class="userProperties">
-    <img class="profImage" [src]="user.profilePic" onerror='this.src = "./crow.jpg"'/>
+    <img class="profImage" [src]="user.profilepicture" onerror='this.src = "./crow.jpg"'/>
     <div class="name">{{user.username}}</div>
     Can DM?
-    <div *ngIf="user.canDM" class="dmHere">Yes</div>
-    <div *ngIf="!user.canDM" class="dmMissing">No</div>
+    <div *ngIf="user.candm" class="dmHere">Yes</div>
+    <div *ngIf="!user.candm" class="dmMissing">No</div>
     Avoiding:
     <div class="Tags">
         <div *ngFor="let tag of avoidTags" class="tag">{{ tag.name }}</div>

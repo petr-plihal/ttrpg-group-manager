@@ -16,6 +16,12 @@ export class GroupsService {
   getAllGroups(): Observable<Header> {
     return this.http.get<Header>(this.urlService.getUrl() + 'groups/');
   }
+  getGroupOwner(group_id: number): Observable<Header> {
+    return this.http.get<Header>(this.urlService.getUrl() + 'group/'+group_id+'/owner/');
+  }
+  getUserGroups(userid: number): Observable<Header> {
+    return this.http.get<Header>(this.urlService.getUrl() + 'user/'+ userid +'/groups/');
+  }
   getGroupById(id: number): Observable<Header> {
     return this.http.get<Header>(this.urlService.getUrl() + 'group/' + id + '/id');
   }

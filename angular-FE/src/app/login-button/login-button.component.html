@@ -1,5 +1,5 @@
 <button class="loginButton">
-    <img class="buttonImg" src="./crow.jpg">
+    <img class="buttonImg" [src]="loginButton.imageurl?.replace('<URL>', '.')" onerror='this.src = "./crow.jpg"'>
     <div class="buttonText">
         {{ loginButton.name }} 
     </div>
