@@ -26,3 +26,7 @@ npm run dev
 ```
 
 Vite will start a development server at `http://localhost:XXXX/`. The port number will be displayed in the terminal.
+
+## Development
+
+To add new dependencies, use `npm install <package-name>`. Vite will automatically update the `package.json` and `package-lock.json` files.
