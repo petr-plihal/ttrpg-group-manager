@@ -8,10 +8,9 @@
         <label for="Username">Create new group: </label>
         <input id="Username" type="text" formControlName="name" placeholder="Group name" class="inputUsernameForm"/>
         <div *ngIf='errorMsg != ""' class="errorText"> {{errorMsg}} </div>
-        <img src="./plus.png" type="submit" class="submitButton" value="Create new user"/>
+        <img src="./plus.png" type="submit" class="submitButton" value="Create new user" (click)="createGroup()"/>
     </form>
     Owned:
-    
     <div class="groups">
         <app-group-item *ngFor="let group of filteredmyGroupsList" [group]="group" [routerLink]="['groupDetail/', group.id]" skipLocationChange class="GroupItem"/>
     </div>

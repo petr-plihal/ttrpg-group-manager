@@ -108,7 +108,7 @@ export class GroupDetailsComponent {
           userid: BelongsTo.data[i].fields.userid,
           groupid: BelongsTo.data[i].fields.groupid,
           isdm: BelongsTo.data[i].fields.isdm,
-          isowner: BelongsTo.data[i].fields.isdm,
+          isowner: BelongsTo.data[i].fields.isowner,
           nickname: BelongsTo.data[i].fields.nickname,
         })
         //if the user doesnt have a nickname then use their username
