@@ -486,6 +486,17 @@ def getAllGroups(request):
 
 
 @require_GET
+def getAllGames(request):
+    try:
+        games = Game.objects.all()
+        games_json = modelAsJson(games)
+        response = {'status': 'success', 'data': games_json}
+        return JsonResponse(response)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+
+@require_GET
 def getOpenGroups(request):
     try:
         groups = Group.objects.filter(isopen=True)
@@ -1115,7 +1126,7 @@ def deleteSchedule(request, sched_id: int):
         return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
 
 @require_GET
 def deleteSchedule(request, sched_id: int):
@@ -1127,12 +1138,14 @@ def deleteSchedule(request, sched_id: int):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-# curl -X GET "http://127.0.0.1:8000/group/1/owner/2/"    
+# curl -X GET "http://127.0.0.1:8000/group/1/owner/2/"
+
+
 @require_GET
 def changeOwner(request, group_id: int, user_id: int):
     try:
-        originalOwner = Belongsto.objects.get(groupid = group_id, isdm = True)
-        nextOwner = Belongsto.objects.get(groupid = group_id, userid = user_id)
+        originalOwner = Belongsto.objects.get(groupid=group_id, isdm=True)
+        nextOwner = Belongsto.objects.get(groupid=group_id, userid=user_id)
         setattr(nextOwner, 'isowner', True)
         setattr(originalOwner, 'isowner', False)
         print(originalOwner)
@@ -1145,12 +1158,14 @@ def changeOwner(request, group_id: int, user_id: int):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-# curl -X GET "http://127.0.0.1:8000/group/3/dm/4/" 
+# curl -X GET "http://127.0.0.1:8000/group/3/dm/4/"
+
+
 @require_GET
 def changeDM(request, group_id: int, user_id: int):
     try:
-        originalDM = Belongsto.objects.get(groupid = group_id, isdm = True)
-        nextDM = Belongsto.objects.get(groupid = group_id, userid = user_id)
+        originalDM = Belongsto.objects.get(groupid=group_id, isdm=True)
+        nextDM = Belongsto.objects.get(groupid=group_id, userid=user_id)
         setattr(nextDM, 'isdm', True)
         setattr(originalDM, 'isdm', False)
         originalDM.save()

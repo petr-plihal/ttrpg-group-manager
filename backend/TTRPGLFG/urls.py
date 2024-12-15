@@ -24,6 +24,7 @@ urlpatterns = [
     re_path("^removePlayerPreference/?$", views.removePlayerPreference, name="removePlayerPreference"),
     re_path("^users/?$", views.getAllUsers, name="getAllUsers"),
     re_path("^groups/?$", views.getAllGroups, name="getAllGroups"),
+    re_path("^games/?$", views.getAllGames, name="getAllGames"),
     re_path("^groups/filter_open/?$", views.getOpenGroups, name="getOpenGroups"),
     re_path("^groups/filter_tags/?$", views.getGroupsWithTags, name="getGroupsWithTags"),
     re_path("^groups/exclude_tags/?$", views.getGroupsWithoutTags, name="getGroupsWithoutTags"),
