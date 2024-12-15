@@ -1,29 +1,11 @@
-<div>
-    <div>Logged in user is: {{ loggedUser?.username }}</div>
-    <app-menu></app-menu>
-    <div>
-        <app-group-item *ngFor="let group of groupList" [group]="group" [routerLink]="['groupDetail/', group.id]"/>
+<div class="column">
+    <app-menu class="leftSticky"></app-menu>
+    <div class="title">Find groups</div>
+    <form>
+        <input type="text" class="search" [formControl]="searchGroupName" (input)="searchGroup()" placeholder="Search..."/>
+    </form>   
+    <div class="groups">
+        <app-group-item *ngFor="let group of filteredList" [group]="group" [routerLink]="['groupDetail/', group.id]" skipLocationChange class="GroupItem"/>
     </div>
-    <form [formGroup]="createGroupForm" (submit)="createGroup()" class="form">
-        <label for="name">Group name</label>
-        <input id="name" type="text" formControlName="name"/>
-
-        <label for="location">Location</label>
-        <input id="location" type="text" formControlName="location"/>
-        
-        <label for="isopen">Is open?</label>
-        <input id="isopen" type="checkbox" formControlName="isopen"/>
-        
-        <label for="description">Description</label>
-        <input id="description" type="text" formControlName="description"/>
-        
-        <label for="maxsize">Max size</label>
-        <input id="maxsize" type="number" formControlName="maxsize"/>
-        
-        <label for="dmneeded">DM needed?</label>
-        <input id="dmneeded" type="checkbox" formControlName="dmneeded"/>
-        
-        <input type="submit"/>
-    </form>
 </div>
 

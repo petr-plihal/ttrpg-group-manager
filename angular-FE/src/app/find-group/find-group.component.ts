@@ -24,6 +24,10 @@ export class FindGroupComponent {
 
   groupList: Group[] = [];
 
+  filteredList: Group[] = [];
+
+  searchGroupName = new FormControl('');
+
   createGroupForm = new FormGroup({
     name: new FormControl(''),
     location: new FormControl(''),
@@ -38,6 +42,16 @@ export class FindGroupComponent {
     this.groupList.push({id: this.groupList.length+1 ,name: this.createGroupForm.value.name ?? '', location: this.createGroupForm.value.location ?? '', isopen: this.createGroupForm.value.isopen ?? false, description: this.createGroupForm.value.description ?? '', maxsize: this.createGroupForm.value.maxsize ?? 0, dmneeded: this.createGroupForm.value.dmneeded ?? false})
   }
 
+  searchGroup(): void {
+    this.filteredList = [];
+    for(let i = 0; i < this.groupList.length; i++){    
+      if(this.groupList[i].name.includes(this.searchGroupName.value ?? '')){
+        this.filteredList.push(this.groupList[i])
+      }
+    }
+    console.log(this.filteredList)
+  }
+
   constructor() {
     this.loggedUser = this.UsersService.getLoggedInUser();
     this.GroupsService.getAllGroups().subscribe((groupsList: any) => {
@@ -48,9 +62,11 @@ export class FindGroupComponent {
           location: groupsList.data[i].fields.location,
           isopen: groupsList.data[i].fields.isopen,
           maxsize: groupsList.data[i].fields.maxsize,
-          dmneeded: groupsList.data[i].fields.dmneeded
+          dmneeded: groupsList.data[i].fields.dmneeded,
+          description: groupsList.data[i].fields.description
         })
       };
+      this.filteredList = this.groupList
     });
   }
 }

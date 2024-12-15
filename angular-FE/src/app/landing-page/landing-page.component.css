@@ -1,9 +1,26 @@
-landingPage{
+.landingPage{
    display: flex;
-   flex-direction: column; 
+   flex-direction: row;
+   height: 100%;
+   width: 100%; 
 }
 
-landingButton{
+.landingButtons{
     display: flex;
     flex-direction: row;  
+}
+
+.landingPageButton{
+    background-color: #606470;
+    color: white;
+    margin: 5px;
+    width: 15vw;
+    height: 10vh;
+    border: none;
+}
+
+.leftSticky{
+    position: absolute;
+    left: 0px;
+    top: 0px;
 }

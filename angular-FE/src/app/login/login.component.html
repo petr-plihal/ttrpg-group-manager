@@ -1,13 +1,16 @@
 <div class="login">
-    <section>
+    <section class="tit">
         Log in        
     </section>
-    <app-login-button *ngFor="let loginButton of loginButtonList" [loginButton]="loginButton" [routerLink]="['/landingPage']" skipLocationChange (click)="loginButtonClick(loginButton)"></app-login-button>
+    <div class="loginButtonContainer">
+        <app-login-button *ngFor="let loginButton of loginButtonList" [loginButton]="loginButton" [routerLink]="['/landingPage']" skipLocationChange (click)="loginButtonClick(loginButton)" class="loginButtonItem"></app-login-button> 
+    </div>
     <div>
-        <form [formGroup]="createUserForm" (submit)="createUser()">
-            <label for="Username">Username</label>
-            <input id="Username" type="text" formControlName="username"/>
-            <input type="submit"/>
+        <form [formGroup]="createUserForm" (submit)="createUser()" class="loginForm">
+            <label for="Username">Create new user:</label>
+            <input id="Username" type="text" formControlName="username" placeholder="Username" class="inputUsernameForm"/>
+            <div *ngIf='errorMsg != ""' class="errorText"> {{errorMsg}} </div>
+            <input type="submit" class="submitButton" value="Create new user"/>
         </form>
     </div>
 </div>

@@ -1,3 +1,17 @@
-<button [routerLink]="['/']" skipLocationChange>Log out</button>
-<button [routerLink]="['/findGroup']" skipLocationChange>Find groups</button>
-<button [routerLink]="['/findPlayers']" skipLocationChange>Find players</button>
+<div class="menu">
+    <div *ngIf="shown" class="buttonMenu">
+        <div class="navButtons"> 
+            <button [routerLink]="['/findGroup']" skipLocationChange class="navButton">Find groups</button>
+            <button [routerLink]="['/findPlayers']" skipLocationChange class="navButton">Find players</button>    
+        </div>
+        <div class="logOutButtons">
+            {{ loggedUser?.username }}
+            <button [routerLink]="['/']" skipLocationChange class="logOutButton">Log out</button>
+        </div>
+    </div>
+    <div class="sideBar">
+        <img src="./menu.png" class="toggleButton" (click)="toggleMenu()"/>
+    </div>  
+</div>
+
+

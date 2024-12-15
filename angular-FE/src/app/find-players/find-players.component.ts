@@ -38,7 +38,8 @@ export class FindPlayersComponent {
       for(let i = 0; i < usersList.data.length; i++){
         this.loginButtonList.push({
           id: usersList.data[i].pk,
-          name: usersList.data[i].fields.username
+          name: usersList.data[i].fields.username,
+          imageurl: usersList.data[i].fields.profilePic ?? ''
         })
       };
       this.filteredLoginButtonList = this.loginButtonList;

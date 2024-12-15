@@ -50,7 +50,7 @@ def createUser(request):
     except Exception:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
 
-    return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'success', 'data': modelAsJson([user, ])})
 
 
 @require_GET
@@ -572,7 +572,8 @@ def updateUser(request, user_id: int):
             if key not in column_names:
                 return JsonResponse({'status': 'error', 'message': f'Field {key} not found in User model'}, status=400)
             if key == 'id':
-                return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+                #return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+                continue
             setattr(user, key, json_data[key])
         user.save()
         return JsonResponse({'status': 'success', 'message': f'User {user_id} updated'})
@@ -592,7 +593,11 @@ def updateGroup(request, group_id: int):
             if key not in column_names:
                 return JsonResponse({'status': 'error', 'message': f'Field {key} not found in User model'}, status=400)
             if key == 'id':
-                return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+                #return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+                continue
+            if key == 'gameid':
+                setattr(group, key, Game.objects.get(id=json_data[key]))
+                continue
             setattr(group, key, json_data[key])
         group.save()
         return JsonResponse({'status': 'success', 'message': f'Group {group_id} updated'})
@@ -1001,13 +1006,11 @@ def createChatMessage(request):
         newChatMessage = Chatmessage()
         for key in jsonData:
             if (key == 'chatid'):
-                setattr(newChatMessage, key,
-                        Chat.objects.get(id=jsonData[key]))
+                setattr(newChatMessage, key, Chat.objects.get(id=jsonData[key]))
                 continue
             if (key == 'userid'):
-                setattr(newChatMessage, key,
-                        User.objects.get(id=jsonData[key]))
-                continue
+                setattr(newChatMessage, key, User.objects.get(id=jsonData[key]))
+                continue  
             setattr(newChatMessage, key, jsonData[key])
         setattr(newChatMessage, 'timestamp', datetime.now())
         newChatMessage.save()
