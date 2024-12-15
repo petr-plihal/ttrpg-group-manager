@@ -35,7 +35,6 @@ export class FindGroupComponent {
         this.filteredList.push(this.groupList[i])
       }
     }
-    console.log(this.filteredList)
   }
 
   constructor() {
