@@ -11,4 +11,10 @@ import { LoginButton } from '../login-button';
 })
 export class LoginButtonComponent {
   @Input() loginButton!: LoginButton;
+
+  imageUrl:string = '';
+
+  ngOnInit(){
+    this.imageUrl = this.loginButton.imageurl?.replace('<URL>','.') ?? '';
+  }
 }

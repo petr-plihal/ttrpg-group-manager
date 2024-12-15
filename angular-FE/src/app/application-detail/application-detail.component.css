@@ -1,0 +1,60 @@
+.leftSticky{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+.title{
+    font-size: larger;
+}
+.buttonContainer{
+    display: flex;
+    flex-direction: row;
+}
+.YesButton{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: greenyellow;
+    color: black;
+    width: 60%;
+    height: 70%;  
+}
+.YesButton:hover{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: green;
+    color: black;
+    width: 60%;
+    height: 70%;  
+}
+.NoButton{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: red;
+    color: black;
+    width: 60%;
+    height: 70%;
+}
+.NoButton:hover{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: rgb(128, 5, 5);
+    color: black;
+    width: 60%;
+    height: 70%;
+}

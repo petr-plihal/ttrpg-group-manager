@@ -1,4 +1,81 @@
-playerDetails{
+.playerDetails{
     display: flex;
     flex-direction: column;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+.tags{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.tag{
+    color: white;
+    background-color: #606470;
+    border-radius: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 10px;
+}
+.title{
+    font-size: 24px;
+}
+.details{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    height: 50%;
+}
+.profImage{
+    width: 20vw;
+    height: 20vw;
+    border-radius: 100%;
+    margin-left: 5vw;
+}
+.imageEdit{
+    margin-left: 5vw;
+    width: 20vw;
+    height: 3vh;
+}
+.Description{
+    text-wrap: wrap;
+    color: white;
+    white-space: normal;
+    width: 60vw;
+    max-width: 60vw;
+    height: 40vh;
+    background-color:#606470;
+    border-radius: 10px;
+    padding: 10px;
+}
+.leftSticky{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+.ApplyButton{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: greenyellow;
+    color: black;
+    width: 60%;
+    height: 5vh;  
+}
+.ApplyButton:hover{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: green;
+    color: black;
+    width: 60%;
+    height: 5vh;   
 }

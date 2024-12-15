@@ -2,7 +2,10 @@
     <div *ngIf="shown" class="buttonMenu">
         <div class="navButtons"> 
             <button [routerLink]="['/findGroup']" skipLocationChange class="navButton">Find groups</button>
-            <button [routerLink]="['/findPlayers']" skipLocationChange class="navButton">Find players</button>    
+            <button [routerLink]="['/findPlayers']" skipLocationChange class="navButton">Find players</button>
+            <button [routerLink]="['/myGroups']" skipLocationChange class="navButton">My groups</button> 
+            <button [routerLink]="['/myApps']" skipLocationChange class="navButton">My applications</button> 
+            <button [routerLink]="['/findPlayers/playerDetail/' + loggedUser!.id]" skipLocationChange class="navButton">My profile</button> 
         </div>
         <div class="logOutButtons">
             {{ loggedUser?.username }}

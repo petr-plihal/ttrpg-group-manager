@@ -1,10 +1,10 @@
-<div>
+<div class="findPlayers">
     <app-menu class="leftSticky"></app-menu>
+    <div class="title">Find players</div>
     <form [formGroup]="SearchUserForm" (keyup)="searchUsers()">
-        <label for="Username">Search</label>
-        <input id="Username" type="text" formControlName="username"/>
+        <input id="Username" type="text" formControlName="username" class="search" placeholder="Search..."/>
     </form>
-    <div>
-        <app-login-button *ngFor="let loginButton of filteredLoginButtonList" [loginButton]="loginButton" [routerLink]="['playerDetail/', loginButton.id]" skipLocationChange></app-login-button>
+    <div class="players">
+        <app-player-item *ngFor="let user of filteredUsersList" [user]="user" [routerLink]="['playerDetail/', user.id]" skipLocationChange></app-player-item>
     </div>
 </div>

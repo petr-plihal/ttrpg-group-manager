@@ -16,6 +16,12 @@ export class GroupsService {
   getAllGroups(): Observable<Header> {
     return this.http.get<Header>(this.urlService.getUrl() + 'groups/');
   }
+  getGroupOwner(group_id: number): Observable<Header> {
+    return this.http.get<Header>(this.urlService.getUrl() + 'group/'+group_id+'/owner/');
+  }
+  getUserGroups(userid: number): Observable<Header> {
+    return this.http.get<Header>(this.urlService.getUrl() + 'user/'+ userid +'/groups/');
+  }
   getGroupById(id: number): Observable<Header> {
     return this.http.get<Header>(this.urlService.getUrl() + 'group/' + id + '/id');
   }
@@ -24,17 +30,24 @@ export class GroupsService {
     return this.http.get<Header>(this.urlService.getUrl() + 'group/' + id + '/players/');
   }
 
-  createGroup(name: string, location: string, isopen: boolean, description: string, maxsize: number, dmneeded: boolean): void {
-    this.http.post<any>(this.urlService.getUrl() + 'group/', {name: name,
+  getOwnedGroups(id: number): Observable<Header> {
+    return this.http.get<Header>(this.urlService.getUrl() + 'user/'+ id +'/ownedGroups/');
+  }
+
+  setOwner(userid: number, groupid: number): Observable<Header> {
+    return this.http.get<Header>(this.urlService.getUrl() + 'group/'+ groupid +'/owner/'+ userid +'/');
+  }
+
+  createGroup(name: string, location: string, isopen: boolean, description: string, maxsize: number, dmneeded: boolean, userid: number): Observable<any> {
+    return this.http.post<any>(this.urlService.getUrl() + 'group/', {name: name,
       description: description,
       location: location,
       isopen: isopen,
       languages: 'English',
       maxsize: maxsize,
       dmneeded: dmneeded,
-      gameid: 1}).subscribe(result => {
-      console.log(result)
-    });
+      gameid: 1})
+    
   }
 
   updateGroup(group: Group): Observable<any>{

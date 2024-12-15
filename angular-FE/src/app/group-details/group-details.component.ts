@@ -82,9 +82,7 @@ export class GroupDetailsComponent {
       this.GroupsService.updateGroup(this.groupDetail).pipe(catchError(err => {
         this.groupDetail!.description = this.backupDescription;
         throw 'error: ' + err.error.message
-      })).subscribe(result => {
-        console.log(result)
-      });
+      }))
     }
   }
 
@@ -94,9 +92,7 @@ export class GroupDetailsComponent {
       this.GroupsService.updateGroup(this.groupDetail).pipe(catchError(err => {
         this.groupDetail!.isopen = !this.groupDetail?.isopen;
         throw 'error: ' + err.error.message
-      })).subscribe(result => {
-        console.log(result)
-      });
+      }))
     }
   }
 
@@ -108,7 +104,7 @@ export class GroupDetailsComponent {
           userid: BelongsTo.data[i].fields.userid,
           groupid: BelongsTo.data[i].fields.groupid,
           isdm: BelongsTo.data[i].fields.isdm,
-          isowner: BelongsTo.data[i].fields.isdm,
+          isowner: BelongsTo.data[i].fields.isowner,
           nickname: BelongsTo.data[i].fields.nickname,
         })
         //if the user doesnt have a nickname then use their username

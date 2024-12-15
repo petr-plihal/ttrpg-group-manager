@@ -1,7 +1,26 @@
-<app-menu></app-menu>
+<app-menu class="leftSticky"></app-menu>
 <div class="playerDetails">
-    <div>{{this.userDetail?.username}}</div>
-    <div>{{this.userDetail?.profilePic}}</div>
-    <div>{{this.userDetail?.desc}}</div>
-    <div>{{this.userDetail?.canDM}}</div>
+    <div class="title">{{this.userDetail?.username}}</div>
+    <div class="details">
+        <div class="picture">
+            <img [src]="this.profilePic.replace('<URL>', '.')" onerror='this.src = "./crow.jpg"' class="profImage"/>
+            <form [formGroup]="profilePictureForm" (keyup.enter)="editProfilePicture()" >
+               <input *ngIf="isLogged" type="text" formControlName="newProfilePic" [value]="this.userDetail?.profilepicture" class="imageEdit"/> 
+            </form> 
+        </div>
+        <div *ngIf="!isLogged" class="Description">{{this.userDetail?.description}}</div>
+        <form *ngIf="isLogged" [formGroup]="descriptionForm" (keyup.enter)="editDesc()">
+            <textarea type="text"  class="Description" formControlName="description"></textarea>
+        </form>
+    </div>
+    <div class="TagsDisplay">
+        I'm looking for:
+        <div class="Tags">
+            <div *ngFor="let tag of avoidTags" class="tag">{{ tag.name }}</div>
+        </div>
+        I'm avoiding:
+        <div class="Tags">
+            <div *ngFor="let tag of lookingTags" class="tag">{{ tag.name }}</div>
+        </div>
+    </div>
 </div>

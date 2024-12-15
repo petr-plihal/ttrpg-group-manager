@@ -1,7 +1,7 @@
 <app-menu class="leftSticky"></app-menu>
 <div class="landingPage">
     <div class="landingButtons">
-        <button class="landingPageButton">DM</button>
+        <button [routerLink]="['/myGroups']" skipLocationChange class="landingPageButton">DM</button>
         <button [routerLink]="['/findGroup']" skipLocationChange class="landingPageButton">Player</button>
     </div>   
 </div>

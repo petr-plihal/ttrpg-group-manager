@@ -29,29 +29,6 @@
 .loginForm{
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    padding: 10px;
-    border-radius: 5px;
-}
-.tit{
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    font-size: large;
-}
-.loginButtonContainer{
-    width: 100%;
-    display: flex;
-    align-self: flex-start;
-    flex-direction: column;
-}
-
-.loginButtonItem{
-    margin: 7px;
-}
-.loginForm{
-    display: flex;
-    flex-direction: column;
     justify-content: space-around;
     align-items: center;
 }
