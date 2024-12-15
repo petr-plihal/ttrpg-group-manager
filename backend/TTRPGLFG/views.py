@@ -255,7 +255,7 @@ def invitePlayer(request):
 
         Application.objects.create(
             groupid=group, applicantid=user, description=description)
-        return JsonResponse({'status': 'success', 'message': f'Application created for user {user_id} to join group {group_id}'})
+        return JsonResponse({'status': 'success', 'data': modelAsJson([Application.objects.get(groupid=group, applicantid=user, description=description), ])})
 
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
@@ -295,7 +295,7 @@ def applyToGroup(request):
 
         chat.save()
 
-        return JsonResponse({'status': 'success', 'message': f'User {user_id} applied to group {group_id}'})
+        return JsonResponse({'status': 'success', 'data': modelAsJson([Application.objects.get(groupid=group, applicantid=user, description=description), ])})
 
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
@@ -1147,13 +1147,12 @@ def deleteSchedule(request, sched_id: int):
 @require_GET
 def changeOwner(request, group_id: int, user_id: int):
     try:
-        originalOwner = Belongsto.objects.get(groupid=group_id, isdm=True)
+        if Belongsto.objects.filter(groupid=group_id, isdm=True).exists():
+            originalOwner = Belongsto.objects.get(groupid=group_id, isdm=True)
+            setattr(originalOwner, 'isowner', False)
+            originalOwner.save()
         nextOwner = Belongsto.objects.get(groupid=group_id, userid=user_id)
         setattr(nextOwner, 'isowner', True)
-        setattr(originalOwner, 'isowner', False)
-        print(originalOwner)
-        print(nextOwner)
-        originalOwner.save()
         nextOwner.save()
         return JsonResponse({'status': 'success', 'data': f'User {user_id} is now the Owner of group {group_id}'})
     except Belongsto.DoesNotExist:
