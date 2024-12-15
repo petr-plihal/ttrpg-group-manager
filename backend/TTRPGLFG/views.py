@@ -1132,7 +1132,7 @@ def changeOwner(request, group_id: int, user_id: int):
     try:
         setattr(Belongsto.objects.get(groupid = group_id, isowner = True), 'isowner', False)
         setattr(Belongsto.objects.get(groupid = group_id, userid = user_id), 'isowner', True)
-        return JsonResponse({'status': 'success', 'data': f'Schedule {sched_id} has been deleted'})
+        return JsonResponse({'status': 'success', 'data': f'User {user_id} is now the Owner of group {group_id}'})
     except Schedule.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
     except json.JSONDecodeError:
@@ -1143,7 +1143,7 @@ def changeDM(request, group_id: int, user_id: int):
     try:
         setattr(Belongsto.objects.get(groupid = group_id, isdm = True), 'isdm', False)
         setattr(Belongsto.objects.get(groupid = group_id, userid = user_id), 'isdm', True)
-        return JsonResponse({'status': 'success', 'data': f'Schedule {sched_id} has been deleted'})
+        return JsonResponse({'status': 'success', 'data': f'User {user_id} is now the DM of group {group_id}'})
     except Schedule.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
     except json.JSONDecodeError:
