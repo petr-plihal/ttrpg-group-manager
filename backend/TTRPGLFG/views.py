@@ -50,7 +50,7 @@ def createUser(request):
     except Exception:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
 
-    return JsonResponse({'status': 'success', 'data': modelAsJson([user, ])})
+    return JsonResponse({'status': 'success', 'userid': user.id, 'data': modelAsJson([user, ])})
 
 
 @require_GET
@@ -572,7 +572,7 @@ def updateUser(request, user_id: int):
             if key not in column_names:
                 return JsonResponse({'status': 'error', 'message': f'Field {key} not found in User model'}, status=400)
             if key == 'id':
-                #return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+                # return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
                 continue
             setattr(user, key, json_data[key])
         user.save()
@@ -593,7 +593,7 @@ def updateGroup(request, group_id: int):
             if key not in column_names:
                 return JsonResponse({'status': 'error', 'message': f'Field {key} not found in User model'}, status=400)
             if key == 'id':
-                #return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+                # return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
                 continue
             if key == 'gameid':
                 setattr(group, key, Game.objects.get(id=json_data[key]))
@@ -1006,11 +1006,13 @@ def createChatMessage(request):
         newChatMessage = Chatmessage()
         for key in jsonData:
             if (key == 'chatid'):
-                setattr(newChatMessage, key, Chat.objects.get(id=jsonData[key]))
+                setattr(newChatMessage, key,
+                        Chat.objects.get(id=jsonData[key]))
                 continue
             if (key == 'userid'):
-                setattr(newChatMessage, key, User.objects.get(id=jsonData[key]))
-                continue  
+                setattr(newChatMessage, key,
+                        User.objects.get(id=jsonData[key]))
+                continue
             setattr(newChatMessage, key, jsonData[key])
         setattr(newChatMessage, 'timestamp', datetime.now())
         newChatMessage.save()
@@ -1178,11 +1180,14 @@ def changeDM(request, group_id: int, user_id: int):
     except Belongsto.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Schedule does not exist'}, status=404)
 # curl -X GET http://localhost:8000/user/1/tags/looking/
+
+
 @require_GET
 def getUserTagsLooking(request, user_id: int):
     try:
         user = User.objects.get(id=user_id)
-        userTags = Usertag.objects.filter(userid=user, islooking=True).values_list('tagid', flat=True)
+        userTags = Usertag.objects.filter(
+            userid=user, islooking=True).values_list('tagid', flat=True)
         tags = Tag.objects.filter(id__in=userTags)
         tagsData = modelAsJson(tags)
         return JsonResponse({'status': 'success', 'data': tagsData})
@@ -1191,13 +1196,16 @@ def getUserTagsLooking(request, user_id: int):
         return JsonResponse({'status': 'error', 'message': f'Group {user_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
+
 # curl -X GET http://localhost:8000/user/1/tags/avoiding/
+
+
 @require_GET
 def getUserTagsAvoiding(request, user_id: int):
     try:
         user = User.objects.get(id=user_id)
-        userTags = Usertag.objects.filter(userid=user, islooking=False).values_list('tagid', flat=True)
+        userTags = Usertag.objects.filter(
+            userid=user, islooking=False).values_list('tagid', flat=True)
         tags = Tag.objects.filter(id__in=userTags)
         tagsData = modelAsJson(tags)
         return JsonResponse({'status': 'success', 'data': tagsData})
