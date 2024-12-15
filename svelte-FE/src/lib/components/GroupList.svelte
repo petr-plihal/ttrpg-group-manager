@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { api } from '$lib/api/api';
-    import { GamepadIcon, Users, MapPin, Languages, Tag } from 'lucide-svelte';
+    import { GamepadIcon, Users, MapPin, Languages, Tag, Plus } from 'lucide-svelte';
     import { page } from '$app/stores';
 
     let groups = $state([]);
@@ -133,6 +133,24 @@
                         </div>
                     </a>
                 {/each}
+
+                <a href="/groups/create" class="block">
+                    <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                        <div class="p-6">
+                            <div class="w-32 h-32 bg-blue-100 rounded-full mx-auto flex items-center justify-center border-4 border-blue-500 mb-4">
+                                <Plus size={64} class="text-blue-500" />
+                            </div>
+
+                            <h2 class="text-xl font-bold text-gray-800 text-center mb-2">
+                                Didn't find the group you're looking for?
+                            </h2>
+
+                            <div class="text-center text-gray-600 mb-4">
+                                Create your own group
+                            </div>
+                        </div>
+                    </div>
+                </a>
             </div>
         {/if}
     </div>

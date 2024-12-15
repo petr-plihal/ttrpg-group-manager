@@ -54,6 +54,7 @@ export const api = {
 	removePlayerPreference: (data: [string|number, string|number]) => request('/removePlayerPreference', 'POST', data),
 	getAllUsers: () => request('/users'),
 	getAllGroups: () => request('/groups'),
+	getAllGames: () => request('/games'),
 	getOpenGroups: () => request('/groups/filter_open'),
 	getGroupsWithTags: () => request('/groups/filter_tags'),
 	getGroupsWithoutTags: () => request('/groups/exclude_tags'),
