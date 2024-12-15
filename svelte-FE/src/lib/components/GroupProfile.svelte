@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { api } from '$lib/api/api';
     import { page } from '$app/stores';
+    import { userAuth } from '$lib/components/Auth';
     import { User, Users, GamepadIcon, MapPin, Languages, Tag } from 'lucide-svelte';
 
     let groupID = $derived($page.params.groupID ? Number($page.params.groupID) : null);
@@ -14,7 +15,7 @@
     let error = $state(null);
 
     onMount(async () => {
-        if (!groupID) {
+        if (groupID == null) {
             error = 'No group ID provided';
             loading = false;
             return;
@@ -180,6 +181,12 @@
                 </div>
             {/if}
         </div>
+        <button
+            type="submit"
+            class="mb-3 mx-auto bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-300 transition-colors"
+        >
+            Join Group
+        </button>
     </div>
 {:else if error}
     <div class="w-full max-w-md mx-auto bg-white shadow-lg rounded-lg p-6">

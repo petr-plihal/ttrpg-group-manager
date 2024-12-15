@@ -1,14 +1,12 @@
-import { get } from 'svelte/store';
-import { authStore } from '$lib/stores/auth';
-
 const BASE_URL = 'http://127.0.0.1:8000';
 
-async function request(endpoint: string, method = 'GET', body: [string|number, string|number]|null = null) {
-	const token = get(authStore).token;
-
+async function request(
+	endpoint: string,
+	method = 'GET',
+	body: [string | number, string | number] | null = null
+) {
 	const headers = {
-		'Content-Type': 'application/json',
-		...(token && { Authorization: `Bearer ${token}` })
+		'Content-Type': 'application/json'
 	};
 
 	const config = {

@@ -1,7 +1,6 @@
 <script>
     import { onMount, tick } from 'svelte';
     import { api } from '$lib/api/api';
-    import { authStore } from '$lib/stores/auth';
 
     export let chatId;
     export let chatType = 'application'; // or 'group'
@@ -55,7 +54,6 @@
         {#each messages as message}
             <div 
                 class="message" 
-                class:own-message={message.userId === $authStore.user.id}
             >
                 <span class="username">{message.user.username}</span>
                 <p>{message.content}</p>

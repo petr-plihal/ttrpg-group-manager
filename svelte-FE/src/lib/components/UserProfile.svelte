@@ -1,11 +1,11 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { api } from '$lib/api/api';
-    import { authStore } from '$lib/stores/auth';
     import { page } from '$app/stores';
+    import { userAuth } from '$lib/components/Auth';
     import { User, Calendar, Users } from 'lucide-svelte';
 
-    let userId = $derived($page.params.userID ? Number($page.params.userID) : null);
+    let userID = $derived($page.params.userID ? Number($page.params.userID) : null);
     let user = $state(null);
     let groups = $state(null);
     let schedule = $state(null);
@@ -13,20 +13,20 @@
     let error = $state(null);
 
     onMount(async () => {
-        if (!userId) {
+        if (userID == null) {
             error = 'No user ID provided';
             loading = false;
             return;
         }
 
         try {
-            let userData = await api.getUserByID(userId);
+            let userData = await api.getUserByID(userID);
             if (!userData.data.length) {
                 throw new Error("User not found");
             }
             user = userData.data[0].fields;
 
-            let groupsData = await api.getUserGroups(userId);
+            let groupsData = await api.getUserGroups(userID);
             groups = await Promise.all(groupsData.data.map(async (group) => {
                 let game = await api.getGameByID(group.fields.gameid);
                 return {
@@ -36,7 +36,7 @@
                 };
             }));
 
-            let scheduleData = await api.getUserSchedule(userId);
+            let scheduleData = await api.getUserSchedule(userID);
             schedule = scheduleData.data.map((data) => data.fields);
         } catch (err) {
             error = err.message || 'Failed to load user profile';
@@ -114,15 +114,6 @@
                     <p class="text-gray-500">No availability set</p>
                 {/if}
             </div>
-
-            <!-- {#if $authStore.user && $authStore.user.id === userId}
-                <button 
-                    on:click={editProfile} 
-                    class="mt-6 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
-                >
-                    Edit Profile
-                </button>
-            {/if} -->
         </div>
     </div>
 {:else if error}
