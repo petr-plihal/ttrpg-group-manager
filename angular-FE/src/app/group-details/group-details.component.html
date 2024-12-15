@@ -5,10 +5,13 @@
     <div class="upperHalf">
         <div class="Players">
             Players:
+            <div class="PlayerHolder">
+                <div *ngFor="let player of playerList" class="Player">{{player.nickname}}</div>
+            </div>
             <div class="ButtonHolder">
                 Is group open?
-                <div *ngIf="" class="YesButton"></div>
-                <div class="NoButton"></div>
+                <div *ngIf="this.groupDetail?.isopen" class="YesButtonNonClickable">Yes!</div>
+                <div *ngIf="!this.groupDetail?.isopen" class="NoButtonNonClickable">No!</div>
             </div>
         </div>
         <div class="Description">{{this.groupDetail?.description}}</div>

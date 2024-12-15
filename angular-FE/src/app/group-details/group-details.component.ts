@@ -1,15 +1,17 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MenuComponent } from '../menu/menu.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
 import { Group } from '../group';
 import { GroupsService } from '../groups.service';
 import { User } from '../user';
+import { BelongsTo } from '../belongs-to';
+import { UsersService } from '../users.service';
 
 @Component({
   selector: 'app-group-details',
   standalone: true,
-  imports: [MenuComponent, CommonModule],
+  imports: [MenuComponent, CommonModule, NgFor],
   templateUrl: './group-details.component.html',
   styleUrl: './group-details.component.css'
 })
@@ -18,14 +20,39 @@ export class GroupDetailsComponent {
   groupId: number = -1;
 
   GroupsService: GroupsService = inject(GroupsService);
+  UsersService: UsersService = inject(UsersService);
 
   groupDetail?: Group;
 
-  playerList: User[] = []
+  playerList: BelongsTo[] = []
+
+  toggleIsOpen() {
+    if(this.groupDetail != undefined){
+      this.groupDetail.isopen = !this.groupDetail?.isopen;
+
+    }
+  }
 
   ngOnInit() {
     this.GroupsService.getGroupPlayers(this.groupId).subscribe((BelongsTo: any) => {
-      console.log(BelongsTo)
+      for(let i = 0; i < BelongsTo.data.length; i++){
+        this.playerList.push({
+          id: BelongsTo.data[i].id,
+          userid: BelongsTo.data[i].fields.userid,
+          groupid: BelongsTo.data[i].fields.groupid,
+          isdm: BelongsTo.data[i].fields.isdm,
+          isowner: BelongsTo.data[i].fields.isdm,
+          nickname: BelongsTo.data[i].fields.nickname,
+        })
+        //if the user doesnt have a nickname then use their username
+        if(this.playerList[i].nickname === undefined || this.playerList[i].nickname === null || this.playerList[i].nickname === ''){
+          this.UsersService.getUserById(this.playerList[i].userid).subscribe(User => {
+            this.playerList[i].nickname = User.data[0].fields.username
+          }
+          )
+        }
+      }
+      
     })
   }
 

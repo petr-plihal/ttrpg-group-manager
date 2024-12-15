@@ -38,6 +38,10 @@ export class GroupsService {
     });
   }
 
+  updateGroup(group: Group): void{
+    this.http.post<any>(this.urlService.getUrl() + 'group/'+ group.id +'/update/', group)
+  }
+
   constructor(private http: HttpClient) { 
     this.url = this.urlService.getUrl();
   }
