@@ -285,7 +285,7 @@ def applyToGroup(request):
         if Application.objects.filter(groupid=group, applicantid=user).exists():
             return JsonResponse({'status': 'info', 'message': f'User {user_id} already has an application for group {group_id}'})
 
-        Application.objects.create(
+        application = Application.objects.create(
             groupid=group, applicantid=user, description=description)
 
         chat = Chat()
@@ -295,7 +295,7 @@ def applyToGroup(request):
 
         chat.save()
 
-        return JsonResponse({'status': 'success', 'message': f'User {user_id} applied to group {group_id}'})
+        return JsonResponse({'status': 'success', 'message': f'User {user_id} applied to group {group_id}', 'applicationid': application.id})
 
     except Group.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
