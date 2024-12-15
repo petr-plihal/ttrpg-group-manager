@@ -47,3 +47,6 @@
     padding-right: 5px;
     font-size: 10px;
 }
+.descriptions{
+    text-wrap: wrap;
+}

@@ -4,17 +4,29 @@
     <div class="Title">{{this.groupDetail?.name}}</div>
     <div class="upperHalf">
         <div class="Players">
-            Players:
+            Players: {{this.playerList.length}}/{{this.groupDetail?.maxsize}}
             <div class="PlayerHolder">
-                <div *ngFor="let player of playerList" class="Player">{{player.nickname}}</div>
+                <div *ngFor="let player of playerList" class="Player">{{player.nickname}}<div><img *ngIf="player.isdm" src="./book.png" class="icon"/><img *ngIf="player.isowner" src="./crown.png" class="icon"/></div></div>
             </div>
             <div class="ButtonHolder">
                 Is group open?
-                <div *ngIf="this.groupDetail?.isopen" class="YesButtonNonClickable">Yes!</div>
-                <div *ngIf="!this.groupDetail?.isopen" class="NoButtonNonClickable">No!</div>
+                <div *ngIf="this.groupDetail?.isopen && !isOwner" class="YesButtonNonClickable">Yes!</div>
+                <div *ngIf="!this.groupDetail?.isopen && !isOwner" class="NoButtonNonClickable">No!</div>
+                <div *ngIf="this.groupDetail?.isopen && isOwner" class="YesButton" (click)="toggleIsOpen()">Yes!</div>
+                <div *ngIf="!this.groupDetail?.isopen && isOwner" class="NoButton" (click)="toggleIsOpen()">No!</div>
             </div>
         </div>
-        <div class="Description">{{this.groupDetail?.description}}</div>
+        <div *ngIf="!isOwner" class="Description">{{this.groupDetail?.description}}</div>
+        <form *ngIf="isOwner" [formGroup]="descriptionForm" (keyup.enter)="editDesc()">
+            <textarea type="text"  class="Description" formControlName="description" value="this.groupDetail?.description">{{this.groupDetail?.description}}</textarea>
+        </form>
     </div>
-    <div class="lowerHalf"></div>
+    <div class="lowerHalf">
+        <div class="Tags">
+            This game is:
+            <div *ngFor="let tag of tagsList" class="tag">{{ tag.name }}</div>
+        </div>
+    </div>
+    <div *ngIf="!isMember && this.groupDetail?.isopen" class="ApplyButton" (click)="applyToGroup()">Apply!</div>
+    <div *ngIf='errorMsg != ""'>{{errorMsg}}</div>
 </div>

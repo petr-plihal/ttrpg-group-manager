@@ -584,6 +584,9 @@ def updateGroup(request, group_id: int):
             if key == 'id':
                 #return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
                 continue
+            if key == 'gameid':
+                setattr(group, key, Game.objects.get(id=json_data[key]))
+                continue
             setattr(group, key, json_data[key])
         group.save()
         return JsonResponse({'status': 'success', 'message': f'Group {group_id} updated'})

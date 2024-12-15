@@ -22,7 +22,7 @@
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: fit-content;
+    height: 50%;
 }
 .Players{
     display: flex;
@@ -32,6 +32,8 @@
     padding-left: 2vw;
 }
 .Description{
+    text-wrap: wrap;
+    color: white;
     width: 60vw;
     height: 40vh;
     background-color:#606470;
@@ -84,6 +86,38 @@
     width: 60%;
     height: 70%;  
 }
+.ApplyButton{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: greenyellow;
+    color: black;
+    width: 60%;
+    height: 5vh;  
+}
+.ApplyButton:hover{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: green;
+    color: black;
+    width: 60%;
+    height: 5vh;   
+}
+.tag{
+    color: white;
+    background-color: #606470;
+    border-radius: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 10px;
+}
 .NoButtonNonClickable{
     display: flex;
     flex-direction: column;
@@ -125,10 +159,26 @@
     flex-direction: column;
 }
 .Player{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     width: 10vw;
     height: 4vh;
     color: black;
     background-color: #D9D9D9;
     border-radius: 5px;
     padding: 10px;
+    margin: 5px;
+}
+.imageHolder{
+    display: flex;
+    flex-direction: column;
+}
+.icon{
+    max-width: 50%;
+    max-height: 100%;
+}
+.Tags{
+    display: flex;
+    flex-direction: row;
 }
