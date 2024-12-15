@@ -65,6 +65,7 @@ class Belongsto(models.Model):
     userid = models.ForeignKey('User', models.CASCADE, db_column='userid')
     groupid = models.ForeignKey('Group', models.CASCADE, db_column='groupid')
     isowner = models.BooleanField()
+    isdm = models.BooleanField(default=False)
     nickname = models.CharField(max_length=30, blank=True, null=True)
 
     def __str__(self):
