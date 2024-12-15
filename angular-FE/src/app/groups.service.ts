@@ -45,6 +45,14 @@ export class GroupsService {
     return this.http.post<any>(this.urlService.getUrl() + 'applyToGroup/', {group_id: groupid, user_id: userid})
   }
 
+  deleteGroup(userid: number):  Observable<any>{
+    return this.http.delete<any>(this.urlService.getUrl() + 'group/'+ userid +'/delete/')
+  }
+
+  leaveGroup(userid: number, groupid: number):  Observable<any>{
+    return this.http.post<any>(this.urlService.getUrl() + 'kickPlayer/', {user_id: userid, group_id: groupid})
+  }
+
   constructor(private http: HttpClient) { 
     this.url = this.urlService.getUrl();
   }

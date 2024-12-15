@@ -28,5 +28,7 @@
         </div>
     </div>
     <div *ngIf="!isMember && this.groupDetail?.isopen" class="ApplyButton" (click)="applyToGroup()">Apply!</div>
+    <div *ngIf="isMember && !isOwner" class="LeaveButton" (click)="leaveGroup()">Leave group</div>
+    <div *ngIf="isMember && isOwner" class="DeleteButton" (click)="deleteGroup()">Delete group</div>
     <div *ngIf='errorMsg != ""'>{{errorMsg}}</div>
 </div>
