@@ -65,4 +65,5 @@ urlpatterns = [
     re_path("^group/(?P<group_id>\\d+)/owner/(?P<user_id>\\d+)/?$", views.changeOwner, name="changeOwner"),
     re_path("^user/(?P<user_id>\\d+)/tags/looking/?$", views.getUserTagsLooking, name="getUserTagsLooking"),
     re_path("^user/(?P<user_id>\\d+)/tags/avoiding/?$", views.getUserTagsAvoiding, name="getUserTagsAvoiding"),
+    re_path("^application/(?P<app_id>\\d+)/id/?$", views.getAppById, name="getAppById")
 ]

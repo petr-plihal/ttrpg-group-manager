@@ -1,3 +1,10 @@
 <div class="applicationDetails">
-
+    <app-menu class="leftSticky"></app-menu>
+    <div class="title">{{group?.name}} application</div>
+    <div>Applicant: {{user?.username}}</div>
+    <div *ngIf="isOwner" class="buttonContainer">
+        <button class="YesButton" (click)="accept()">Accept</button>
+        <button class="NoButton" (click)="deny()">Deny</button>
+    </div>
+    
 </div>

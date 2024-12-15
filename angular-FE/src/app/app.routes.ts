@@ -58,7 +58,7 @@ export const routes: Routes = [
         title: 'My applications'
     },
     {
-        path: 'myApps/:id',
+        path: 'myApps/:id/:owner',
         component: ApplicationDetailComponent,
         title: 'Application detail'
     }
