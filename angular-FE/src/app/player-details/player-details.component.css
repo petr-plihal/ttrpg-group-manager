@@ -1,4 +1,9 @@
-playerDetails{
+.playerDetails{
     display: flex;
     flex-direction: column;
+}
+.leftSticky{
+    position: absolute;
+    left: 0px;
+    top: 0px;
 }

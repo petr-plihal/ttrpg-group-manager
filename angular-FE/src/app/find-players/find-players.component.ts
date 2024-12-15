@@ -7,20 +7,20 @@ import { UsersService } from '../users.service';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { PlayerItemComponent } from '../player-item/player-item.component';
 
 @Component({
   selector: 'app-find-players',
   standalone: true,
-  imports: [MenuComponent, LoginButtonComponent, ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [MenuComponent, PlayerItemComponent, ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './find-players.component.html',
   styleUrl: './find-players.component.css'
 })
 export class FindPlayersComponent {
-  loginButtonList: LoginButton[] = [];
 
-  filteredLoginButtonList: LoginButton[] = []
+  usersList?: User[] = [];
 
-  usersList?: User[];
+  filteredUsersList: User[] = [];
 
   UsersService: UsersService = inject(UsersService);
 
@@ -29,20 +29,20 @@ export class FindPlayersComponent {
   });
 
   searchUsers(): void {
-    this.filteredLoginButtonList = this.loginButtonList.filter((loginButton) =>  loginButton.name.includes(this.SearchUserForm.value.username ?? ''));
+    this.filteredUsersList = this.usersList!.filter((user) =>  user.username.includes(this.SearchUserForm.value.username ?? ''));
   }
 
   //change this to something better afterwards
   constructor() {
     this.UsersService.getAllLoginButtons().subscribe((usersList: any) => {
       for(let i = 0; i < usersList.data.length; i++){
-        this.loginButtonList.push({
+        this.usersList!.push({
           id: usersList.data[i].pk,
-          name: usersList.data[i].fields.username,
-          imageurl: usersList.data[i].fields.profilePic ?? ''
+          username: usersList.data[i].fields.username,
+          profilePic: usersList.data[i].fields.profilepicture.replace('<URL>','.') ?? ''
         })
       };
-      this.filteredLoginButtonList = this.loginButtonList;
+      this.filteredUsersList = this.usersList!;
     });
   }
 }
