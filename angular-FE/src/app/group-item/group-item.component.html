@@ -3,8 +3,8 @@
   <div>Location: {{ group.location }}</div>
   <div *ngIf="group.dmneeded" class="dmMissing">DM needed</div>
   <div *ngIf="!group.dmneeded" class="dmHere">Has DM</div>
-  <div *ngIf="group.isopen" class="dmMissing">Open!</div>
-  <div *ngIf="!group.isopen" class="dmHere">Closed</div>
+  <div *ngIf="group.isopen" class="dmHere">Open!</div>
+  <div *ngIf="!group.isopen" class="dmMissing">Closed</div>
   <div class="tags">
     <div *ngFor="let tag of tags" class="tag">{{ tag.name }}</div>
   </div>

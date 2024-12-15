@@ -29,17 +29,20 @@ export class GroupsService {
       description: description,
       location: location,
       isopen: isopen,
-      languages: 'test',
+      languages: 'English',
       maxsize: maxsize,
       dmneeded: dmneeded,
-      gameid: 1,
-      groupchatcontent: 'test'}).subscribe(result => {
+      gameid: 1}).subscribe(result => {
       console.log(result)
     });
   }
 
-  updateGroup(group: Group): void{
-    this.http.post<any>(this.urlService.getUrl() + 'group/'+ group.id +'/update/', group)
+  updateGroup(group: Group): Observable<any>{
+    return this.http.put<any>(this.urlService.getUrl() + 'group/'+ group.id +'/update/', group)
+  }
+
+  applyToGroup(groupid: number, userid: number):  Observable<any>{
+    return this.http.post<any>(this.urlService.getUrl() + 'applyToGroup/', {group_id: groupid, user_id: userid})
   }
 
   constructor(private http: HttpClient) { 

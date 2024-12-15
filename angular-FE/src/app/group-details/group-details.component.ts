@@ -7,11 +7,16 @@ import { GroupsService } from '../groups.service';
 import { User } from '../user';
 import { BelongsTo } from '../belongs-to';
 import { UsersService } from '../users.service';
+import { catchError, Observable } from 'rxjs';
+import { TagsService } from '../tags.service';
+import { Tag } from '../tag';
+import { LoginButton } from '../login-button';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-group-details',
   standalone: true,
-  imports: [MenuComponent, CommonModule, NgFor],
+  imports: [MenuComponent, CommonModule, NgFor, ReactiveFormsModule],
   templateUrl: './group-details.component.html',
   styleUrl: './group-details.component.css'
 })
@@ -21,15 +26,57 @@ export class GroupDetailsComponent {
 
   GroupsService: GroupsService = inject(GroupsService);
   UsersService: UsersService = inject(UsersService);
+  TagsService: TagsService = inject(TagsService);
 
   groupDetail?: Group;
 
   playerList: BelongsTo[] = []
 
+  tagsList: Tag[] = []
+
+  loggedUser?: User;
+
+  isMember: boolean = false;
+
+  descriptionForm = new FormGroup({
+    description: new FormControl('') 
+  }) 
+
+  isOwner: boolean = false;
+  
+  errorMsg: string = '';
+
+  backupDescription: string = '';
+
+  applyToGroup() {
+    this.errorMsg = '';
+    this.GroupsService.applyToGroup(this.groupDetail!.id, this.loggedUser!.id).subscribe(response => {
+      this.errorMsg = response.message
+    })
+  }
+
+  editDesc(){
+    if(this.groupDetail != undefined){
+      this.backupDescription = this.groupDetail!.description ?? ''
+      this.groupDetail!.description = this.descriptionForm.value.description!
+      this.GroupsService.updateGroup(this.groupDetail).pipe(catchError(err => {
+        this.groupDetail!.description = this.backupDescription;
+        throw 'error: ' + err.error.message
+      })).subscribe(result => {
+        console.log(result)
+      });
+    }
+  }
+
   toggleIsOpen() {
     if(this.groupDetail != undefined){
       this.groupDetail.isopen = !this.groupDetail?.isopen;
-
+      this.GroupsService.updateGroup(this.groupDetail).pipe(catchError(err => {
+        this.groupDetail!.isopen = !this.groupDetail?.isopen;
+        throw 'error: ' + err.error.message
+      })).subscribe(result => {
+        console.log(result)
+      });
     }
   }
 
@@ -51,6 +98,12 @@ export class GroupDetailsComponent {
           }
           )
         }
+        if(this.playerList[i].userid === this.loggedUser?.id){
+          this.isMember = true
+          if(this.playerList[i].isowner){
+            this.isOwner = true
+          }
+        }
       }
       
     })
@@ -70,6 +123,15 @@ export class GroupDetailsComponent {
         dmneeded: Group.data[0].fields.dmneeded,
         gameid: Group.data[0].fields.gameid
       }
+      this.descriptionForm.setValue({description: Group.data[0].fields.description})
     })
+    this.TagsService.getGroupTags(this.groupId).subscribe((Tags: any) => {
+      for(let i = 0; i < Tags.data.length; i++){
+        this.tagsList.push({
+          name: Tags.data[i].fields.name
+        })
+      }
+    })
+    this.loggedUser = this.UsersService.getLoggedInUser()
   }
 }
