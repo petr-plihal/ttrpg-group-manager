@@ -990,8 +990,7 @@ def createChatMessage(request):
         newChatMessage = Chatmessage()
         for key in jsonData:
             if (key == 'chatid'):
-                setattr(newChatMessage, key,
-                        Chat.objects.get(id=jsonData[key]))
+                setattr(newChatMessage, key, Chat.objects.get(id=jsonData[key]))
                 continue
             if (key == 'userid'):
                 setattr(newChatMessage, key, User.objects.get(id=jsonData[key]))
