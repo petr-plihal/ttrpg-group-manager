@@ -56,7 +56,6 @@ export class MyApplicationsComponent {
             dmneeded: groupsList.data[i].fields.dmneeded,
             description: groupsList.data[i].fields.description
         })
-
         this.applicationService.getGroupApplications(groupsList.data[i].pk).subscribe(results => {
           for(let i = 0; i < results.data.length; i++){
             this.inboundApps.push({
