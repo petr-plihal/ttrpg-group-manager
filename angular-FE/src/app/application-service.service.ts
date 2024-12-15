@@ -20,6 +20,14 @@ export class ApplicationService {
     return this.http.post(this.urlService.getUrl() + 'acceptApplication/'+ appid +'/', {})
   }
 
+  getGroupApplications(groupid: number): Observable<any>{
+    return this.http.get(this.urlService.getUrl() + 'group/'+ groupid +'/applications/', {})
+  }
+
+  getUserApplications(userid: number): Observable<any>{
+    return this.http.get(this.urlService.getUrl() + 'user/'+ userid +'/applications/', {})
+  }
+
   constructor(private http: HttpClient) { 
       this.url = this.urlService.getUrl();
     }

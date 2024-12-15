@@ -1,21 +1,13 @@
-<div class="column">
+<div class="myApps">
+    <div class="title">My applications</div>
     <app-menu class="leftSticky"></app-menu>
-    <div class="title">Find groups</div>
-    <form>
-        <input type="text" class="search" [formControl]="searchGroupName" (input)="searchGroup()" placeholder="Search..."/>
-    </form>
-    <form [formGroup]="createGroupForm" (submit)="createGroup()" class="newGroupForm">
-        <label for="Username">Create new group: </label>
-        <input id="Username" type="text" formControlName="name" placeholder="Group name" class="inputUsernameForm"/>
-        <div *ngIf='errorMsg != ""' class="errorText"> {{errorMsg}} </div>
-        <img src="./plus.png" type="submit" class="submitButton" value="Create new user" (click)="createGroup()"/>
-    </form>
-    Owned:
-    <div class="groups">
-        <app-group-item *ngFor="let group of filteredmyGroupsList" [group]="group" [routerLink]="['groupDetail/', group.id]" skipLocationChange class="GroupItem"/>
+    <div>Outbound application</div>
+    <div class="appContainer">
+        <div *ngFor="let app of outboundApps" class="app" [routerLink]="['/myApps', app.id]" skipLocationChange> {{nameMap.get(app.groupid)}} </div>
     </div>
-    Member:
-    <div class="groups">
-        <app-group-item *ngFor="let group of filteredList" [group]="group" [routerLink]="['groupDetail/', group.id]" skipLocationChange class="GroupItem"/>
+    
+    <div>Inbound application</div>
+    <div class="appContainer">
+       <div *ngFor="let app of inboundApps" class="app" [routerLink]="['/myApps', app.id]" skipLocationChange> {{nameMap.get(app.groupid)}} </div> 
     </div>
 </div>
