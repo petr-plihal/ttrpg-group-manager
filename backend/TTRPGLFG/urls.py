@@ -63,4 +63,6 @@ urlpatterns = [
     re_path("^schedule/(?P<sched_id>\\d+)/delete/?$", views.deleteSchedule, name="deleteSchedule"),
     re_path("^group/(?P<group_id>\\d+)/dm/(?P<user_id>\\d+)/?$", views.changeDM, name="changeDM"),
     re_path("^group/(?P<group_id>\\d+)/owner/(?P<user_id>\\d+)/?$", views.changeOwner, name="changeOwner"),
+    re_path("^user/(?P<user_id>\\d+)/tags/looking/?$", views.getUserTagsLooking, name="getUserTagsLooking"),
+    re_path("^user/(?P<user_id>\\d+)/tags/avoiding/?$", views.getUserTagsAvoiding, name="getUserTagsAvoiding"),
 ]
