@@ -42,7 +42,6 @@ export class LoginComponent {
         this.errorMsg = err.error.message;
         throw 'error in source. Details: ' + err.error.message;
       })).subscribe(result => {
-        console.log(result)
         this.loginButtonList.push({id: result.data[0].pk, name: result.data[0].fields.username, imageurl: result.data[0].fields.profilepicture});
         return;
       })

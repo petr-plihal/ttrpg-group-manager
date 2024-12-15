@@ -24,7 +24,6 @@ export class PlayerItemComponent {
     ngOnInit() {
       this.description = this.user.description?.substring(0,50)
       this.profPic = this.user.profilepicture!.replace('<URL>','.')
-      console.log(this.user.profilepicture)
       if(this.description?.length ?? 0 >= 49){
         this.description?.concat('...')
       }

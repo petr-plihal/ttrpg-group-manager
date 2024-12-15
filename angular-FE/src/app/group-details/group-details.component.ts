@@ -92,9 +92,7 @@ export class GroupDetailsComponent {
       this.GroupsService.updateGroup(this.groupDetail).pipe(catchError(err => {
         this.groupDetail!.isopen = !this.groupDetail?.isopen;
         throw 'error: ' + err.error.message
-      })).subscribe(result => {
-        console.log(result)
-      });
+      }))
     }
   }
 

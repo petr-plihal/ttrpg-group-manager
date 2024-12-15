@@ -55,7 +55,6 @@ export class ApplicationDetailComponent {
     } else {
       this.isOwner = true
     }
-    console.log(this.isOwner)
     this.applicationService.getAppById(this.applicationId).subscribe(appResult => {
       this.applicationDetail = {
         id: appResult.data[0].pk,
