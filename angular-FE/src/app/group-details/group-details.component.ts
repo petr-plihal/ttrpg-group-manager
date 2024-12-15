@@ -12,6 +12,7 @@ import { TagsService } from '../tags.service';
 import { Tag } from '../tag';
 import { LoginButton } from '../login-button';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {Router} from "@angular/router"
 
 @Component({
   selector: 'app-group-details',
@@ -51,8 +52,27 @@ export class GroupDetailsComponent {
   applyToGroup() {
     this.errorMsg = '';
     this.GroupsService.applyToGroup(this.groupDetail!.id, this.loggedUser!.id).subscribe(response => {
-      this.errorMsg = response.message
+      if(response.status === 'info'){
+        this.errorMsg = 'You have already applied for this group'
+      }
+      this.errorMsg = 'Application sent!'
     })
+  }
+
+  leaveGroup() {
+    this.GroupsService.leaveGroup(this.loggedUser!.id, this.groupDetail!.id).subscribe(
+      result => {
+        this.router.navigate(['/landingPage'])
+      }
+    )
+  }
+
+  deleteGroup() {
+    this.GroupsService.deleteGroup(this.groupDetail!.id).subscribe(
+      result => {
+        this.router.navigate(['/landingPage'])
+      }
+    )
   }
 
   editDesc(){
@@ -109,7 +129,7 @@ export class GroupDetailsComponent {
     })
   }
 
-  constructor() {
+  constructor(private router: Router) {
     this.groupId = Number(this.route.snapshot.params['id'])
     this.GroupsService.getGroupById(this.groupId).subscribe((Group: any) => {
       this.groupDetail = {

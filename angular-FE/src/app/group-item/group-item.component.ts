@@ -21,8 +21,8 @@ export class GroupItemComponent {
   tagService: TagsService = inject(TagsService);
   ngOnInit() {
     console.log(this.group.description)
-    this.description = this.group.description?.substring(0,100)
-    if(this.description?.length ?? 0 >= 100){
+    this.description = this.group.description?.substring(0,50)
+    if(this.description?.length ?? 0 >= 49){
       this.description?.concat('...')
     }
     this.tagService.getGroupTags(this.group.id).subscribe(tags => {
