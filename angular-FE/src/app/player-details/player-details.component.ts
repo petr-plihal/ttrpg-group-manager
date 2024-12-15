@@ -49,7 +49,7 @@ export class PlayerDetailsComponent {
       this.UsersService.editUser(this.userDetail!).pipe(catchError(err => {
         this.userDetail!.description = this.backupDescription;
         throw 'error: ' + err.error.message
-      }))
+      })).subscribe(results => {})
     }
   }
 
@@ -60,7 +60,7 @@ export class PlayerDetailsComponent {
       this.UsersService.editUser(this.userDetail!).pipe(catchError(err => {
         this.userDetail!.profilepicture = this.backupDescription;
         throw 'error: ' + err.error.message
-      }))
+      })).subscribe(results => {})
     }
   }
 
