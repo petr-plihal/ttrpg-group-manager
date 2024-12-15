@@ -20,6 +20,10 @@ export class GroupsService {
     return this.http.get<Header>(this.urlService.getUrl() + 'group/' + id + '/id');
   }
 
+  getGroupPlayers(id: number): Observable<Header> {
+    return this.http.get<Header>(this.urlService.getUrl() + 'group/' + id + '/players/');
+  }
+
   createGroup(name: string, location: string, isopen: boolean, description: string, maxsize: number, dmneeded: boolean): void {
     this.http.post<any>(this.urlService.getUrl() + 'group/', {name: name,
       description: description,
