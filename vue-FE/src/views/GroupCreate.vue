@@ -1,8 +1,7 @@
-<!-- src/views/CreateGroup.vue -->
 <template>
     <Base>
         <template #navbar-buttons>
-            <router-link to="/">Home</router-link>
+            <!-- <router-link to="/">Home</router-link> -->
         </template>
         <template #default>
             <h1>Vytvoř skupinu</h1>
@@ -47,61 +46,63 @@
                 <p>Error: {{ error }}</p>
             </div>
             <div v-if="success">
-                <p>Group created successfully!</p>
+                <p>Skupina úspěšně vytvořena!</p>
             </div>
         </template>
     </Base>
 </template>
 
 <script setup>
-    /*curl -X POST http://127.0.0.1:8000/group/ \
-        -H "Content-Type: application/json" \
-        -d '{
-            "name": "New Group",
-            "description": "This is a new group.",
-            "location": "Online",
-            "isopen": true,
-            "languages": "English",
-            "maxsize": 10,
-            "dmneeded": true,
-            "gameid": 1,
-            "groupchatcontent": "Welcome to the new group!"
-        }'*/
-    import { ref } from 'vue'
-    import Base from '../components/Base.vue'
-    import api from '../services/api'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import Base from '../components/Base.vue'
+import api from '../services/api'
+import { useUserStore } from '../stores/user'
 
-    const form = ref({
-        name: '',
-        description: '',
-        location: '',
-        isopen: false,
-        languages: '',
-        maxsize: 1,
-        dmneeded: false,
-        gameid: 1,
-        groupchatcontent: ''
-    })
+const router = useRouter()
+const userStore = useUserStore()
+const currentUser = userStore.currentUser
 
-    const error = ref(null)
-    const success = ref(false)
+const form = ref({
+    name: '',
+    description: '',
+    location: '',
+    isopen: false,
+    languages: '',
+    maxsize: 1,
+    dmneeded: false,
+    gameid: 1,
+    groupchatcontent: ''
+})
 
-    function submitForm() {
-        api.createGroup(form.value)
-            .then(response => {
-                if (response.data.status === 'success') {
-                    success.value = true
-                    error.value = null
-                } else {
-                    error.value = response.data.message
-                    success.value = false
-                }
-            })
-            .catch(err => {
-                error.value = err.message
-                success.value = false
-            })
+const error = ref(null)
+const success = ref(false)
+
+async function submitForm() {
+    try {
+        const response = await api.createGroup(form.value)
+        console.log('Create group response:', response.data)
+
+        if (response.data.status === 'success') {
+            console.log('Group data:', response.data.groupid)
+            const groupId = response.data.groupid
+            await api.setGroupOwner(groupId, { user_id: currentUser.pk })
+
+            console.log('Group owner set')
+
+            success.value = true
+            error.value = null
+            router.push(`/group/${groupId}/lobby`)
+        } else {
+            error.value = response.data.message
+            success.value = false
+        }
+    } catch (err) {
+        console.error('Error creating group:', err)
+        error.value = err.message
+        success.value = false
     }
+}
 </script>
 
 <style scoped>
