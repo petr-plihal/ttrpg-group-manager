@@ -49,9 +49,7 @@ export class PlayerDetailsComponent {
       this.UsersService.editUser(this.userDetail!).pipe(catchError(err => {
         this.userDetail!.description = this.backupDescription;
         throw 'error: ' + err.error.message
-      })).subscribe(result => {
-        console.log(result)
-      });
+      }))
     }
   }
 
@@ -62,10 +60,7 @@ export class PlayerDetailsComponent {
       this.UsersService.editUser(this.userDetail!).pipe(catchError(err => {
         this.userDetail!.profilepicture = this.backupDescription;
         throw 'error: ' + err.error.message
-      })).subscribe(result => {
-        this.profilePic = this.userDetail!.profilepicture ?? ''
-        console.log(result)
-      });
+      }))
     }
   }
 

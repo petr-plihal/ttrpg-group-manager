@@ -48,7 +48,6 @@ export class MyGroupsComponent {
   });
 
   createGroup(): void {
-    console.log(this.loggedUser!.id)
     this.GroupsService.createGroup(this.createGroupForm.value.name ?? '', this.createGroupForm.value.location ?? '', this.createGroupForm.value.isopen ?? false, this.createGroupForm.value.description ?? '', this.createGroupForm.value.maxsize ?? 5, this.createGroupForm.value.dmneeded ?? false, this.loggedUser!.id).subscribe(result => {
       this.ApplicationService.invitePlayer(this.loggedUser!.id , result.groupid).subscribe(appResult =>{
         this.ApplicationService.acceptInvite(appResult.data[0].pk).subscribe(acceptResult => {
@@ -110,8 +109,6 @@ export class MyGroupsComponent {
     this.GroupsService.getUserGroups(this.loggedUser!.id).subscribe((groupsList: any) => {
       for(let i = 0; i < groupsList.data.length; i++){
         this.GroupsService.getGroupOwner(groupsList.data[i].pk).subscribe((owner: any) => {
-            console.log(owner)
-            console.log(this.loggedUser)
             if(owner.data[0].fields.userid === this.loggedUser?.id){
               this.myGroupsList.push({
                 id: groupsList.data[i].pk,
