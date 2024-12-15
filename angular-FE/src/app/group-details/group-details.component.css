@@ -48,3 +48,87 @@
     background-color: #D9D9D9;
     border-radius: 10px;
 }
+.YesButtonNonClickable{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: greenyellow;
+    color: black;
+    width: 60%;
+    height: 70%;  
+}
+.YesButton{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: greenyellow;
+    color: black;
+    width: 60%;
+    height: 70%;  
+}
+.YesButton:hover{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: green;
+    color: black;
+    width: 60%;
+    height: 70%;  
+}
+.NoButtonNonClickable{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: red;
+    color: black;
+    width: 60%;
+    height: 70%;
+}
+.NoButton{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: red;
+    color: black;
+    width: 60%;
+    height: 70%;
+}
+.NoButton:hover{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-size: large;
+    background-color: rgb(128, 5, 5);
+    color: black;
+    width: 60%;
+    height: 70%;
+}
+.PlayerHolder{
+    display: flex;
+    flex-direction: column;
+}
+.Player{
+    width: 10vw;
+    height: 4vh;
+    color: black;
+    background-color: #D9D9D9;
+    border-radius: 5px;
+    padding: 10px;
+}

@@ -572,7 +572,8 @@ def updateUser(request, user_id: int):
             if key not in column_names:
                 return JsonResponse({'status': 'error', 'message': f'Field {key} not found in User model'}, status=400)
             if key == 'id':
-                return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+                #return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+                continue
             setattr(user, key, json_data[key])
         user.save()
         return JsonResponse({'status': 'success', 'message': f'User {user_id} updated'})
@@ -592,7 +593,8 @@ def updateGroup(request, group_id: int):
             if key not in column_names:
                 return JsonResponse({'status': 'error', 'message': f'Field {key} not found in User model'}, status=400)
             if key == 'id':
-                return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+                #return JsonResponse({'status': 'error', 'message': 'Cannot update id'}, status=400)
+                continue
             setattr(group, key, json_data[key])
         group.save()
         return JsonResponse({'status': 'success', 'message': f'Group {group_id} updated'})
