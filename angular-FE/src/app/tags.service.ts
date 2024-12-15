@@ -12,8 +12,11 @@ export class TagsService {
   url?: string;
 
   urlService: BackendUrlService = inject(BackendUrlService);
-  getUserTags(userid: number): Observable<Header>{
-    return this.http.get<any>(this.urlService.getUrl() + 'user/' + userid + '/tags/')
+  getUserAvoidTags(userid: number): Observable<Header>{
+    return this.http.get<any>(this.urlService.getUrl() + 'user/' + userid + '/tags/looking/')
+  }
+  getUserLookingTags(userid: number): Observable<Header>{
+    return this.http.get<any>(this.urlService.getUrl() + 'user/' + userid + '/tags/avoiding/')
   }
   getGroupTags(groupid: number): Observable<Header>{
     return this.http.get<any>(this.urlService.getUrl() + 'group/' + groupid + '/tags/')

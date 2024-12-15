@@ -15,6 +15,7 @@ import { UsersService } from '../users.service';
 export class PlayerDetailsComponent {
   route: ActivatedRoute = inject(ActivatedRoute);
   playerId = -1;
+  description: string = '';
 
   UsersService: UsersService = inject(UsersService);
 
