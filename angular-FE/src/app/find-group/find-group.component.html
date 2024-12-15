@@ -5,7 +5,7 @@
         <input type="text" class="search" [formControl]="searchGroupName" (input)="searchGroup()" placeholder="Search..."/>
     </form>   
     <div class="groups">
-        <app-group-item *ngFor="let group of filteredList" [group]="group" [routerLink]="['groupDetail/', group.id]" skipLocationChange/>
+        <app-group-item *ngFor="let group of filteredList" [group]="group" [routerLink]="['groupDetail/', group.id]" skipLocationChange class="GroupItem"/>
     </div>
 </div>
 

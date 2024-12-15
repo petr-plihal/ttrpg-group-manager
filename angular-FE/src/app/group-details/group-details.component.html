@@ -1,11 +1,17 @@
-<app-menu class="leftSticky"></app-menu>
+
 <div class="groupDetails">
-    <div>{{this.groupDetail?.name}}</div>
-    <div>{{this.groupDetail?.description}}</div>
-    <div>{{this.groupDetail?.location}}</div>
-    <div>{{this.groupDetail?.isopen}}</div>
-    <div>{{this.groupDetail?.languages}}</div>
-    <div>{{this.groupDetail?.maxsize}}</div>
-    <div>{{this.groupDetail?.dmneeded}}</div>
-    <div>{{this.groupDetail?.gameid}}</div>
+    <app-menu class="leftSticky"></app-menu>
+    <div class="Title">{{this.groupDetail?.name}}</div>
+    <div class="upperHalf">
+        <div class="Players">
+            Players:
+            <div class="ButtonHolder">
+                Is group open?
+                <div *ngIf="" class="YesButton"></div>
+                <div class="NoButton"></div>
+            </div>
+        </div>
+        <div class="Description">{{this.groupDetail?.description}}</div>
+    </div>
+    <div class="lowerHalf"></div>
 </div>
