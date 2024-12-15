@@ -30,6 +30,10 @@ export class GroupsService {
     return this.http.get<Header>(this.urlService.getUrl() + 'group/' + id + '/players/');
   }
 
+  getOwnedGroups(id: number): Observable<Header> {
+    return this.http.get<Header>(this.urlService.getUrl() + 'user/'+ id +'/ownedGroups/');
+  }
+
   setOwner(userid: number, groupid: number): Observable<Header> {
     return this.http.get<Header>(this.urlService.getUrl() + 'group/'+ groupid +'/owner/'+ userid +'/');
   }

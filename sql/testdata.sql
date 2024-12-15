@@ -29,10 +29,10 @@ INSERT INTO `group` (`name`, `description`, `location`, `isopen`, `languages`, `
 -- Insert data into `application`
 -- -----------------------------------------------------
 INSERT INTO `application` (`applicantid`, `groupid`, `description`) VALUES
-(1, 1, 'Looking to join a D&D group.'),
-(2, 2, 'Interested in Pathfinder.'),
-(3, 3, 'Catan is my favorite game.'),
-(4, 4, 'I enjoy playing Risk.');
+(1, 2, 'Looking to join a D&D group.'),
+(2, 3, 'Interested in Pathfinder.'),
+(3, 4, 'Catan is my favorite game.'),
+(4, 1, 'I enjoy playing Risk.');
 
 -- -----------------------------------------------------
 -- Insert data into `belongsto`
