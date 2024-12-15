@@ -67,8 +67,9 @@ export class MyApplicationsComponent {
               groupid: results.data[i].fields.groupid,
               description: ''
             })
+            this.nameMap.set(results.data[i].pk, groupsList.data[i].fields.name)
           }
-          this.nameMap.set(results.data[i].pk, groupsList.data[i].fields.name)
+          
         })
       }
 

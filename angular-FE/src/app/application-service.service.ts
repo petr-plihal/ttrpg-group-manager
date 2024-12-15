@@ -19,13 +19,20 @@ export class ApplicationService {
   acceptInvite(appid: number): Observable<any>{
     return this.http.post(this.urlService.getUrl() + 'acceptApplication/'+ appid +'/', {})
   }
+  denyInvite(appid: number): Observable<any>{
+    return this.http.post(this.urlService.getUrl() + 'denyApplication/'+ appid +'/', {})
+  }
 
   getGroupApplications(groupid: number): Observable<any>{
-    return this.http.get(this.urlService.getUrl() + 'group/'+ groupid +'/applications/', {})
+    return this.http.get(this.urlService.getUrl() + 'group/'+ groupid +'/applications/')
   }
 
   getUserApplications(userid: number): Observable<any>{
-    return this.http.get(this.urlService.getUrl() + 'user/'+ userid +'/applications/', {})
+    return this.http.get(this.urlService.getUrl() + 'user/'+ userid +'/applications/')
+  }
+
+  getAppById(appid: Number): Observable<any>{
+    return this.http.get(this.urlService.getUrl() + 'application/'+ appid +'/id/')
   }
 
   constructor(private http: HttpClient) { 

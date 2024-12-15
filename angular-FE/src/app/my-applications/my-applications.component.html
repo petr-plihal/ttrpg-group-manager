@@ -3,11 +3,11 @@
     <app-menu class="leftSticky"></app-menu>
     <div>Outbound application</div>
     <div class="appContainer">
-        <div *ngFor="let app of outboundApps" class="app" [routerLink]="['/myApps', app.id]" skipLocationChange> {{nameMap.get(app.groupid)}} </div>
+        <div *ngFor="let app of outboundApps" class="app" [routerLink]="['/myApps', app.id, 0]" skipLocationChange> {{nameMap.get(app.groupid)}} </div>
     </div>
     
     <div>Inbound application</div>
     <div class="appContainer">
-       <div *ngFor="let app of inboundApps" class="app" [routerLink]="['/myApps', app.id]" skipLocationChange> {{nameMap.get(app.groupid)}} </div> 
+       <div *ngFor="let app of inboundApps" class="app" [routerLink]="['/myApps', app.id, 1]" skipLocationChange> {{nameMap.get(app.groupid)}} </div> 
     </div>
 </div>

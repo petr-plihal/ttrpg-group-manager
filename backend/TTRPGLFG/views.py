@@ -1205,5 +1205,17 @@ def getUserTagsAvoiding(request, user_id: int):
         return JsonResponse({'status': 'error', 'message': f'Group {user_id} not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+@require_GET
+def getAppById(request, app_id: int):
+    try:
+        app = Application.objects.get(id=app_id)
+
+        return JsonResponse({'status': 'success', 'data': modelAsJson([app, ])})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': f'Group {group_id} not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 ############## End of Marek Pechan work ##############################

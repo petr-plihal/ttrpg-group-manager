@@ -52,7 +52,6 @@ export class MyGroupsComponent {
     this.GroupsService.createGroup(this.createGroupForm.value.name ?? '', this.createGroupForm.value.location ?? '', this.createGroupForm.value.isopen ?? false, this.createGroupForm.value.description ?? '', this.createGroupForm.value.maxsize ?? 5, this.createGroupForm.value.dmneeded ?? false, this.loggedUser!.id).subscribe(result => {
       this.ApplicationService.invitePlayer(this.loggedUser!.id , result.groupid).subscribe(appResult =>{
         this.ApplicationService.acceptInvite(appResult.data[0].pk).subscribe(acceptResult => {
-          console.log(acceptResult)
           this.GroupsService.setOwner(this.loggedUser!.id, result.groupid).subscribe(lastResult => {
             this.refreshGroups()
           })

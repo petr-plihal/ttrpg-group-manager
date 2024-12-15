@@ -82,9 +82,7 @@ export class GroupDetailsComponent {
       this.GroupsService.updateGroup(this.groupDetail).pipe(catchError(err => {
         this.groupDetail!.description = this.backupDescription;
         throw 'error: ' + err.error.message
-      })).subscribe(result => {
-        console.log(result)
-      });
+      }))
     }
   }
 
