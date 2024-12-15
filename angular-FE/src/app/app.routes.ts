@@ -5,6 +5,7 @@ import { FindGroupComponent } from './find-group/find-group.component';
 import { FindPlayersComponent } from './find-players/find-players.component';
 import { PlayerDetailsComponent } from './player-details/player-details.component';
 import { GroupDetailsComponent } from './group-details/group-details.component';
+import { MyGroupsComponent } from './my-groups/my-groups.component';
 
 
 export const routes: Routes = [
@@ -37,5 +38,15 @@ export const routes: Routes = [
         path: 'findGroup/groupDetail/:id',
         component: GroupDetailsComponent,
         title: 'Group details'
-    }
+    },
+    {
+        path: 'myGroups',
+        component: MyGroupsComponent,
+        title: 'My gorup'
+    },
+    {
+        path: 'myGroups/groupDetail/:id',
+        component: GroupDetailsComponent,
+        title: 'Group details'
+    },
 ];

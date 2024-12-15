@@ -57,7 +57,7 @@ export class LoginComponent {
         this.loginButtonList.push({
           id: usersList.data[i].pk,
           name: usersList.data[i].fields.username,
-          imageurl: usersList.data[i].fields.profilePic ?? ''
+          imageurl: usersList.data[i].fields.profilepicture ?? ''
         })
       };
     });

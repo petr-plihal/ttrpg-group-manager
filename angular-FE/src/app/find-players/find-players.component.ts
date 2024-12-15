@@ -39,7 +39,7 @@ export class FindPlayersComponent {
         this.usersList!.push({
           id: usersList.data[i].pk,
           username: usersList.data[i].fields.username,
-          profilePic: usersList.data[i].fields.profilepicture.replace('<URL>','.') ?? ''
+          profilepicture: usersList.data[i].fields.profilepicture.replace('<URL>','.') ?? ''
         })
       };
       this.filteredUsersList = this.usersList!;

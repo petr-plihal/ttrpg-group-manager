@@ -58,6 +58,10 @@ export class UsersService {
     return this.http.post<any>(this.urlService.getUrl() + 'user/', {username: username, profilepicture: 'test', description: 'test', candm: false})
   }
 
+  editUser(user: User): Observable<any> {
+    return this.http.put<any>(this.urlService.getUrl() + 'user/'+ user.id +'/update/', user)
+  }
+
   constructor(private http: HttpClient) {
     this.url = this.urlService.getUrl();
   }
