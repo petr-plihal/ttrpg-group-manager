@@ -14,6 +14,13 @@ ENV PYTHONDONTWRITEBYTECODE=1
 #Prevents Python from buffering stdout and stderr
 ENV PYTHONUNBUFFERED=1 
  
+# Install system dependencies for mysqlclient
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    default-libmysqlclient-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 # Upgrade pip
 RUN pip install --upgrade pip 
  
