@@ -1,0 +1,38 @@
+services:
+    database:
+        image: mysql:8.0
+        environment:
+            - MYSQL_ROOT_PASSWORD=pass123
+            - MYSQL_DATABASE=ttrpg_db
+            - MYSQL_USER=ttrpg_user
+            - MYSQL_PASSWORD=ttrpg_pass
+        ports:
+            - "6606:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            timeout: 20s
+            retries: 10
+
+    backend:
+        build: ./backend
+        ports:
+            - "8000:8000"
+        depends_on:
+            database:
+                condition: service_healthy
+        environment:
+            - DB_HOST=database
+            - DB_NAME=ttrpg_db
+            - DB_USER=ttrpg_user
+            - DB_PASSWORD=ttrpg_pass
+            - DB_PORT=3306
+        volumes:
+            - ./backend:/app  # For development - mounts repo directory into the container
+        command: >
+            sh -c "python manage.py migrate &&
+                   python manage.py runserver 0.0.0.0:8000"
+
+volumes:
+    mysql_data:

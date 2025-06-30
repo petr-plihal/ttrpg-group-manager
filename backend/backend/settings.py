@@ -80,14 +80,19 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+import os
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': "test",
-        "HOST": "localhost",
-        "PORT": "3306",
+        'NAME': os.getenv('DB_NAME', 'ttrpg_db'),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'PORT': os.getenv('DB_PORT', '6606'),
+        'USER': os.getenv('DB_USER', 'ttrpg_user'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'ttrpg_pass'),
         'OPTIONS': {
-            'sql_mode': 'traditional',         # Optional: To ensure SQL mode compatibility
+            'sql_mode': 'traditional',
+            'charset': 'utf8mb4',
         },
     }
 }
